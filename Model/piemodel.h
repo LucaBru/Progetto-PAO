@@ -4,22 +4,10 @@
 #include "Model/Chart/PieChart/piechart.h"
 #include <QSortFilterProxyModel>
 
-class PieChartModel : public QSortFilterProxyModel{
-protected:
-    bool filterAcceptsColumn(int source_column, const QModelIndex &source_parent) const override;
-public:
-    PieChartModel(QObject *parent =nullptr);
-};
-
-
 class PieModel : public Model{
-private:
-    PieChart * chart;
 public:
     PieModel(View *v, QObject * p =nullptr);
-    void changeChartTitle(const QString& newTitle) override;
     void getChartFromDocument(const QJsonDocument& doc) override;
-    void save(const QString& path) const override;
     int rowCount(const QModelIndex& parent) const override;
     int columnCount(const QModelIndex &parent) const override;
     //contratto insertRows : true sse inserisce dalla count righe a partire da row (incluso)

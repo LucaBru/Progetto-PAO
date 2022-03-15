@@ -37,7 +37,7 @@ public:
     int slicesCount() const;
     bool checkSliceName(const QString& name) const;
     void getFromJSON(const QJsonDocument& doc) override;
-    QJsonDocument parsing() const override;
+    QJsonObject* parsing() const override;
 };
 
 #endif // PIECHART_H

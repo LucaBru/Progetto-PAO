@@ -2,6 +2,7 @@
 #define CHART_H
 #include <QString>
 #include <QJsonDocument>
+#include <QJsonObject>
 
 class Chart{
 protected:
@@ -10,7 +11,7 @@ public:
     Chart(const QString& t =QString());
     void changeTitle(const QString& newTitle);
     virtual void getFromJSON(const QJsonDocument& doc) =0;
-    virtual QJsonDocument parsing() const =0;
+    virtual QJsonObject* parsing() const;
 };
 
 #endif // CHART_H

@@ -18,6 +18,8 @@ PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget
     slice_value->setValidator(new QDoubleValidator(this));
     add_serie->setText("Add Slice");
     remove_serie->setText("Remove Slice");
+    save_chart->setText("Save Pie Chart");
+    save_chart_as->setText("Save Pie Chart as");
     chart_info->setTitle("Pie Chart");
     serie_info->setTitle("Slice");
     serie_info_layout->addRow("slice name", slice_name);
@@ -26,21 +28,25 @@ PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget
 
     QObject::connect(slice_name, SIGNAL(editingFinished()), this, SLOT(changeSliceName()));
     QObject::connect(slice_value, SIGNAL(editingFinished()), this, SLOT(changeSliceValue()));
+    QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSlice(int)));
 }
 
 void PieChartWidget::changeSliceName(){
     int current_index = series->currentIndex();
     if(current_index >= 0 && model->setData(model->index(current_index, 0), slice_name->text()));
-          //  slices->slices().takeAt(current_index)->setLabel(slice_name->text());
 }
 
 void PieChartWidget::changeSliceValue(){
     int current_index = series->currentIndex();
     if(current_index >= 0 && model->setData(model->index(current_index, 1), slice_value->text()))
        slices->slices().takeAt(current_index)->setValue(slice_value->text().toDouble());
-
 }
 void PieChartWidget::changeSliceColor(){}
+
+void PieChartWidget::currentSlice(int index){
+    slice_name->setText(model->data(model->index(index, 0, QModelIndex())).toString());
+    slice_value->setText(model->data(model->index(index, 1, QModelIndex())).toString());
+}
 
 
 

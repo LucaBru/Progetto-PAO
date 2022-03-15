@@ -20,6 +20,7 @@ protected slots:
     void changeSliceName();
     void changeSliceValue();
     void changeSliceColor();
+    void currentSlice(int index);
 };
 
 #endif // PIECHARTWIDGET_H

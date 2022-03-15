@@ -9,9 +9,7 @@ int main(int argc, char *argv[]){
 }
 
 /*
- *
- * rivedere collegamenti su PieChartWidget e verificare la correttezza del modello
- * sistemare QComboBox in maniera tale che si vedano solamnete i nome e non i valori
+ * leggere commento su model.cpp
  *
  *
  */

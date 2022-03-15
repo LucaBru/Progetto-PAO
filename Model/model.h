@@ -9,11 +9,12 @@ class View;
 class Model : public QAbstractItemModel{
 protected:
     View *view;
+    Chart *chart;
 public:
-    Model(View* v, QObject* p =nullptr);
-    virtual void changeChartTitle(const QString& newTitle) =0;
+    Model(View* v, Chart* c, QObject* p =nullptr);
+    virtual void changeChartTitle(const QString& newTitle);
     virtual void getChartFromDocument(const QJsonDocument& doc) =0;
-    virtual void save(const QString& path) const =0;
+    virtual bool save(const QString& path) const;
 };
 
 #endif // MODEL_H
