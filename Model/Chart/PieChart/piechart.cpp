@@ -23,6 +23,14 @@ void Slice::changeValue(double newValue){
 
 PieChart::PieChart(const QString &t) : Chart(t){}
 
+PieChart::PieChart(const QJsonObject& obj) : Chart(obj) {
+    QJsonObject list_of_slices = obj.value("slices").toObject();
+    if(!list_of_slices.isEmpty()){
+    for(QJsonObject::const_iterator i = list_of_slices.begin(); i != list_of_slices.end(); ++i)
+        slices.push_back(new Slice(i.key(), i.value().toDouble()));
+    }
+}
+
 vector<Slice*> PieChart::copySlices(const PieChart & from){
     vector<Slice*> result;
     for(vector<Slice*>::const_iterator i = from.slices.begin(); i != from.slices.end(); ++i){
@@ -85,8 +93,6 @@ const Slice* PieChart::getSlice(int index) const{
 int PieChart::slicesCount() const{
     return slices.size();
 }
-
-void PieChart::getFromJSON(const QJsonDocument &doc){ /* DA IMPLEMENTARE*/ }
 
 QJsonObject* PieChart::parsing() const {
     QJsonObject *obj = Chart::parsing();

@@ -19,7 +19,6 @@ protected:
     QGroupBox *serie_info;
     QComboBox *series;
     QLineEdit *chart_title;
-    QRadioButton *legend;
     QPushButton *add_serie;
     QPushButton *remove_serie;
     QPushButton *save_chart;
@@ -30,12 +29,9 @@ protected:
     QChartView *chart_view;
     QString chart_file_path;
 
-    virtual void insertInvalidSerieAt(int index, int count =1) =0; //aggiunge le serie aggiunte al model
-    virtual void removeInvalidSerieAt(int index, int count =1) =0; //rimuove le serie non presenti nel model
-    void alert(const QString& subtitle ="something goes wrong", const QString& title = "error", QMessageBox::Icon icon =QMessageBox::Critical) const; //funzione per mostrare un QMessageBox d'errore
-
 public:
     ChartWidget(View *v, Model * m, QWidget *parent =nullptr);
+    void setCurrentChartPath(const QString& path);
 private slots:
     void changeTitle();
     void insertSerie();

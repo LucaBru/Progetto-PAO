@@ -12,9 +12,14 @@ protected:
     Chart *chart;
 public:
     Model(View* v, Chart* c, QObject* p =nullptr);
+    const QString& getChartTitle() const;
     virtual void changeChartTitle(const QString& newTitle);
-    virtual void getChartFromDocument(const QJsonDocument& doc) =0;
     virtual bool save(const QString& path) const;
 };
 
 #endif // MODEL_H
+
+/*
+ * i vari model devono avvisare la vista degli aggiornamenti fatti
+ *
+ */

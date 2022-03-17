@@ -26,6 +26,7 @@ private:
 
 public:
     PieChart(const QString& t = QString());
+    PieChart(const QJsonObject& obj);
 
     //gestione profonda della memoria
     PieChart(const PieChart& from);
@@ -36,7 +37,6 @@ public:
     const Slice* getSlice(int index) const; //può tornare un nullptr
     int slicesCount() const;
     bool checkSliceName(const QString& name) const;
-    void getFromJSON(const QJsonDocument& doc) override;
     QJsonObject* parsing() const override;
 };
 

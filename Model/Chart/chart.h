@@ -9,8 +9,9 @@ protected:
     QString title;
 public:
     Chart(const QString& t =QString());
+    Chart(const QJsonObject& obj);
+    const QString& getTitle() const;
     void changeTitle(const QString& newTitle);
-    virtual void getFromJSON(const QJsonDocument& doc) =0;
     virtual QJsonObject* parsing() const;
 };
 

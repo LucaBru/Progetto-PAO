@@ -1,10 +1,6 @@
 #include "piemodel.h"
 
-PieModel::PieModel(View *v, QObject *parent) : Model(v, new PieChart(), parent){}
-
-void PieModel::getChartFromDocument(const QJsonDocument &doc){ /* DA IMPLEMENTARE */
-    chart->getFromJSON(doc);
-}
+PieModel::PieModel(View *v, const QJsonObject& obj, QObject *parent) : Model(v, ((obj.isEmpty()) ? new PieChart() : new PieChart(obj)), parent){}
 
 int PieModel::rowCount(const QModelIndex &parent) const{
     return (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->slicesCount() : 0;
@@ -18,6 +14,8 @@ bool PieModel::insertRows(int row, int count, const QModelIndex &parent){
     beginInsertRows(parent, row, row+count-1);
     bool result = (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->insertSlices(row, count) : false;
     endInsertRows();
+    if(result)
+        emit addMultipleSlices(row, count);
     return result;
 }
 
@@ -25,6 +23,8 @@ bool PieModel::removeRows(int row, int count, const QModelIndex &parent){
     beginRemoveRows(parent, row, row+count-1);
     bool result = (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->removeSlices(row, count) : false;
     endRemoveRows();
+    if(result)
+        emit removeMultipleSlices(row, count);
     return result;
 }
 
@@ -46,11 +46,13 @@ bool PieModel::setData(const QModelIndex &index, const QVariant &value, int role
          if(index.column() == 0 && piechart->checkSliceName(value.toString())){
              const_cast<Slice*>(current)->changeName(value.toString());
              emit dataChanged(index, index);
+             emit sliceAtNameChanged(index.row(), value.toString());
              return true;
          }
          if(index.column() == 1 ){
              const_cast<Slice*>(current)->changeValue(value.toDouble());
              emit dataChanged(index, index);
+             emit sliceAtValueChanged(index.row(), value.toDouble());
              return true;
          }
      }

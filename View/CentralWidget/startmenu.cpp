@@ -1,6 +1,9 @@
 #include "startmenu.h"
 #include <QFileDialog>
 #include <QVBoxLayout>
+#include <QJsonDocument>
+#include "View/CentralWidget/ChartWidget/piechartwidget.h"
+
 
 StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), createfrominput(new QPushButton("create from input")), createfromfile(new QPushButton("get from file")), createfromlast(new QPushButton("get last")){
 
@@ -14,10 +17,25 @@ StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), creat
     QObject::connect(createfromlast, SIGNAL(clicked()), this, SLOT(createFromLast()));
 }
 
-int StartMenu::checkChartType(const QString& path){}
-
 void StartMenu::createFromFile(){
     QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
+    QFile file(path);
+
+    if(file.open(QFile::ReadOnly)){
+        QJsonObject obj = QJsonDocument::fromJson(file.readAll()).object();
+        if(!obj.isEmpty() && !obj.value("type").isUndefined()){
+            QString chart_type = obj.value("type").toString();
+            if(chart_type.compare("pie") == 0){
+                PieChartWidget *w = new PieChartWidget(view, new PieModel(view, obj));
+                view->setCentralWidget(w);
+                w->setCurrentChartPath(path);
+            }
+            else if(chart_type.compare("line") == 0){
+                //manca per linechart e barchart
+            }
+            else{}
+        }
+    }
     //invocazione di checkchartType
     //una volta riconosciuto il tipo invoco sveglio lo slot create...Chart() nella vista il quale
     //si occupa della creazione del model e del ChartWidget adatto

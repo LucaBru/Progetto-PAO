@@ -11,16 +11,18 @@ protected:
     QLineEdit *slice_value;
     QLineEdit *slice_color;
 
-    void insertInvalidSerieAt(int index, int count) override;
-    void removeInvalidSerieAt(int index, int count) override;
-
+    void connectPieModelSignals() const;
+    void checkInitialChartValues();
 public:
     PieChartWidget(View *v, Model *m, QWidget *parent =nullptr);
 protected slots:
-    void changeSliceName();
-    void changeSliceValue();
-    void changeSliceColor();
+    void userChangeSliceName();
+    void userChangeSliceValue();
     void currentSlice(int index);
+    void multipleSlicesInserted(int first, int count);
+    void multipleSlicesRemoved(int first, int count);
+    void sliceChangedName(int index, const QString& name);
+    void sliceChangedValue(int index, double value);
 };
 
 #endif // PIECHARTWIDGET_H

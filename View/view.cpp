@@ -5,9 +5,7 @@
 #include "Model/piemodel.h"
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()){
-   //setCentralWidget(new StartMenu(this));
-   PieModel *model = new PieModel(this);
-   setCentralWidget(new PieChartWidget(this, model));
+   setCentralWidget(new StartMenu(this));
 }
 
 View::~View(){

@@ -5,9 +5,9 @@
 #include <QSortFilterProxyModel>
 
 class PieModel : public Model{
+    Q_OBJECT
 public:
-    PieModel(View *v, QObject * p =nullptr);
-    void getChartFromDocument(const QJsonDocument& doc) override;
+    PieModel(View *v, const QJsonObject& obj = QJsonObject(), QObject * parent =nullptr);
     int rowCount(const QModelIndex& parent) const override;
     int columnCount(const QModelIndex &parent) const override;
     //contratto insertRows : true sse inserisce dalla count righe a partire da row (incluso)
@@ -18,6 +18,12 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     QModelIndex parent(const QModelIndex &index) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
+signals:
+    void addMultipleSlices(int row, int count);
+    void removeMultipleSlices(int row, int count);
+    void sliceAtNameChanged(int row, const QString& name);
+    void sliceAtValueChanged(int row, double value);
+
 };
 
 #endif // PIEMODEL_H
