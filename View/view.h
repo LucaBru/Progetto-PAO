@@ -22,4 +22,9 @@ public slots:
     void createBarChart();
 };
 
+/*
+ * eliminare vari commenti superflui e aggiornare gerarchia di classi in
+ * https://app.creately.com/d/h9nH6ZYJoPx/edit
+ *
+ */
 #endif // VIEW_H

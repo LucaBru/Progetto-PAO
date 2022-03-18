@@ -32,10 +32,9 @@ protected:
 public:
     ChartWidget(View *v, Model * m, QWidget *parent =nullptr);
     void setCurrentChartPath(const QString& path);
+    ~ChartWidget();
 private slots:
     void changeTitle();
-    void insertSerie();
-    void removeSerie();
     void saveChart();
     void saveChartAs();
 };

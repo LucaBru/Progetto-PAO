@@ -33,9 +33,12 @@ PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget
     serie_info_layout->addRow("slice value", slice_value);
     serie_info_layout->addRow("slice color", slice_color);
 
+    QObject::connect(add_serie, SIGNAL(clicked()), this, SLOT(userInsertSlice()));
+    QObject::connect(remove_serie, SIGNAL(clicked()), this, SLOT(userRemoveSlice()));
     QObject::connect(slice_name, SIGNAL(editingFinished()), this, SLOT(userChangeSliceName()));
     QObject::connect(slice_value, SIGNAL(editingFinished()), this, SLOT(userChangeSliceValue()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSlice(int)));
+
     connectPieModelSignals();
 }
 
@@ -49,6 +52,16 @@ void PieChartWidget::userChangeSliceValue(){
     int current_index = series->currentIndex();
     if(current_index >= 0)
         model->setData(model->index(current_index, 1), slice_value->text());
+}
+
+void PieChartWidget::userInsertSlice(){
+    int current_index = series->currentIndex();
+    model->insertRows((current_index == -1) ? 0 : current_index, 1, QModelIndex());
+}
+
+void PieChartWidget::userRemoveSlice() {
+    int current_index = series->currentIndex();
+    model->removeRows((current_index == -1) ? 0 : current_index, 1, QModelIndex());
 }
 
 void PieChartWidget::currentSlice(int index){

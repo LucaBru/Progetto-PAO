@@ -8,6 +8,13 @@
 
 Model::Model(View *v, Chart *c, QObject *p) : QAbstractItemModel(p), view(v), chart(c){}
 
+Model::~Model(){
+    //il model viene distrutto alla distruzione dalla vista => basta delete su chart
+    //spiegazione: quando chuido un certo ChartWidget e ritorno così al menu principale elimino anche il model
+    //non ha senso eliminare il model e non la vista e viceversa
+    delete chart;
+}
+
 const QString& Model::getChartTitle() const{
     return chart->getTitle();
 }

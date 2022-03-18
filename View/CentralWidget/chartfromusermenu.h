@@ -10,6 +10,7 @@ private:
     QPushButton *createbarchart;
 public:
     ChartFromUserMenu(View *v, QWidget *parent =nullptr);
+
 };
 
 #endif // CHARTFROMUSERMENU_H

@@ -9,6 +9,7 @@ View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()){
 }
 
 View::~View(){
+    delete mainW->centralWidget();
     delete mainW;
 }
 
@@ -33,8 +34,7 @@ void View::createFromUserInput(){
 }
 
 void View::createPieChart(){
-    //creo un PieModel,
-    //setCentralWidget(PieWidget) <- passandogli il model appena creato
+    setCentralWidget(new PieChartWidget(this, new PieModel(this)));
 }
 
 void View::createLineChart(){

@@ -12,6 +12,7 @@ protected:
     Chart *chart;
 public:
     Model(View* v, Chart* c, QObject* p =nullptr);
+    ~Model();
     const QString& getChartTitle() const;
     virtual void changeChartTitle(const QString& newTitle);
     virtual bool save(const QString& path) const;

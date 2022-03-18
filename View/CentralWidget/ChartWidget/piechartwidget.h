@@ -18,6 +18,8 @@ public:
 protected slots:
     void userChangeSliceName();
     void userChangeSliceValue();
+    void userInsertSlice();
+    void userRemoveSlice();
     void currentSlice(int index);
     void multipleSlicesInserted(int first, int count);
     void multipleSlicesRemoved(int first, int count);

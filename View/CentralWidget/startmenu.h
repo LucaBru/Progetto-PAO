@@ -9,8 +9,6 @@ private:
     QPushButton *createfrominput;
     QPushButton *createfromfile;
     QPushButton *createfromlast;
-
-    int static checkChartType(const QString& path);
 public:
     StartMenu(View *v, QWidget *parent =nullptr);
 private slots:

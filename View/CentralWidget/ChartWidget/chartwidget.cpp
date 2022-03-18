@@ -3,6 +3,7 @@
 #include "Model/piemodel.h"
 
 ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, parent), model(m), chart_info(new QGroupBox()), serie_info(new QGroupBox()), series(new QComboBox()), chart_title(new QLineEdit()), add_serie(new QPushButton()), remove_serie(new QPushButton()), save_chart(new QPushButton()), save_chart_as(new QPushButton()), chart(new QChart()), chart_view(new QChartView(chart)), chart_info_layout(new QFormLayout(chart_info)), serie_info_layout(new QFormLayout(serie_info)){
+
     chart_title->setText(model->getChartTitle());
     series->setModel(model);
     QGridLayout *l = new QGridLayout(this);
@@ -18,11 +19,15 @@ ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, 
     chart_info_layout->addRow(save_chart_as);
 
     QObject::connect(chart_title, SIGNAL(editingFinished()), this, SLOT(changeTitle()));
-    QObject::connect(add_serie, SIGNAL(clicked()), this, SLOT(insertSerie()));
-    QObject::connect(remove_serie, SIGNAL(clicked()), this, SLOT(removeSerie()));
     QObject::connect(save_chart, SIGNAL(clicked()), this, SLOT(saveChart()));
     QObject::connect(save_chart_as, SIGNAL(clicked()), this, SLOT(saveChartAs()));
 
+}
+
+ChartWidget::~ChartWidget(){
+    //tutti gli items eliminati
+    //chart essendo associato a chart_view viene eliminato da esse
+    delete model;
 }
 
 void ChartWidget::setCurrentChartPath(const QString &path){
@@ -33,15 +38,7 @@ void ChartWidget::changeTitle(){
    model->changeChartTitle(chart_title->text());
 }
 
-void ChartWidget::insertSerie(){
-    int current_index = series->currentIndex();
-    model->insertRows((current_index == -1) ? 0 : current_index, 1, QModelIndex());
-}
 
-void ChartWidget::removeSerie(){
-    int current_index = series->currentIndex();
-    model->removeRows((current_index == -1) ? 0 : current_index, 1, QModelIndex());
-}
 
 void ChartWidget::saveChart(){
     if(chart_file_path.isEmpty())
