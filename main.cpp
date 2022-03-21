@@ -10,19 +10,11 @@ int main(int argc, char *argv[]){
 
 /*
  * problema: scelta decisionale
- *  devo scegliere come aggiornare i dati nella vista:
- *      - direttamente : dalla vista :
- *          - aggiorno il model,
- *          - dopo aver aggiornato il model aggiorno la vista
- *          - il model non emette nessun segnale
- *          - pro: semplice e veloce, contro: soggetto a incongruenza vista/modello, non estendibile in caso di cambio vista
- *      - indirettamente : dalla vista:
- *          - aggiorno il model
- *          - il model emette segnali di modifica presi dalla vista, la quale a sua volta di aggiorna
- *          - pro: congruenza vista/modello, separazione vista/modello, creazione semplice / modifica semplice della vista, il tutto è automatizzato
- *            (in quanto una corretta modifica sul modello comporta la conseguente emissione del segnale => modifica sulla vista)
- *          - contro: costo (richiede molte più operazione, funzioni...)
+ *  leggere commento in linechartwidget
  *
+ *
+ *
+ *  --- vecchio ----
  *
  * SCELTA FINALE: - TOP -
  *  - i QCOmboBox sono collegati al model => quando si aggiorna il model si aggiorna anche la vista =>

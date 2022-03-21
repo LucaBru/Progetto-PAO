@@ -4,7 +4,7 @@
 #include <vector>
 using std::vector;
 
-class Slice{
+class Slice : public ChartData{
 private:
     QString name;
     double value;
@@ -22,8 +22,6 @@ private:
 
     static vector<Slice*> copySlices(const PieChart& from);
     static void deleteSlices(PieChart& pieChart);
-
-
 public:
     PieChart(const QString& t = QString());
     PieChart(const QJsonObject& obj);
@@ -34,7 +32,7 @@ public:
     ~PieChart();
     bool insertSlices(int row, int count);
     bool removeSlices(int row, int count);
-    const Slice* getSlice(int index) const; //può tornare un nullptr
+    Slice* getSlice(int index) const; //può tornare un nullptr
     int slicesCount() const;
     bool checkSliceName(const QString& name) const;
     QJsonObject* parsing() const override;

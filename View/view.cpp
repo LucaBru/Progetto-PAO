@@ -3,9 +3,11 @@
 #include "View/CentralWidget/chartfromusermenu.h"
 #include "View/CentralWidget/ChartWidget/piechartwidget.h"
 #include "Model/piemodel.h"
+#include "View/CentralWidget/ChartWidget/linechartwidget.h"
+#include "Model/linemodel.h"
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()){
-   setCentralWidget(new StartMenu(this));
+   setCentralWidget(new LineChartWidget(this, new LineModel(this)));
 }
 
 View::~View(){

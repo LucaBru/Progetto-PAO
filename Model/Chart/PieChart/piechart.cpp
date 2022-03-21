@@ -86,7 +86,7 @@ bool PieChart::removeSlices(int row, int count){
     return false;
 }
 
-const Slice* PieChart::getSlice(int index) const{
+Slice* PieChart::getSlice(int index) const{
     return (index >= 0 && index < slices.size()) ? slices[index] : nullptr;
 }
 

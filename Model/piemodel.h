@@ -17,7 +17,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     QModelIndex parent(const QModelIndex &index) const override;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
 signals:
     void addMultipleSlices(int row, int count);
     void removeMultipleSlices(int row, int count);

@@ -14,8 +14,8 @@ public:
     Model(View* v, Chart* c, QObject* p =nullptr);
     ~Model();
     const QString& getChartTitle() const;
-    virtual void changeChartTitle(const QString& newTitle);
-    virtual bool save(const QString& path) const;
+    void changeChartTitle(const QString& newTitle);
+    bool save(const QString& path) const;
 };
 
 #endif // MODEL_H

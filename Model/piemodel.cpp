@@ -41,16 +41,16 @@ QVariant PieModel::data(const QModelIndex &index, int role) const{
 
 bool PieModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     PieChart * piechart = dynamic_cast<PieChart*>(chart);
-    const Slice *current = (!index.parent().isValid() && piechart) ? piechart->getSlice(index.row()) : nullptr;
-     if(current){
+    Slice *current = (!index.parent().isValid() && piechart) ? piechart->getSlice(index.row()) : nullptr;
+     if(current && piechart){
          if(index.column() == 0 && piechart->checkSliceName(value.toString())){
-             const_cast<Slice*>(current)->changeName(value.toString());
+             current->changeName(value.toString());
              emit dataChanged(index, index);
              emit sliceAtNameChanged(index.row(), value.toString());
              return true;
          }
          if(index.column() == 1 ){
-             const_cast<Slice*>(current)->changeValue(value.toDouble());
+             current->changeValue(value.toDouble());
              emit dataChanged(index, index);
              emit sliceAtValueChanged(index.row(), value.toDouble());
              return true;
@@ -60,7 +60,8 @@ bool PieModel::setData(const QModelIndex &index, const QVariant &value, int role
 }
 
 QModelIndex PieModel::parent(const QModelIndex &index) const{
-    return QModelIndex();
+    return QModelIndex(); //in questo caso non serve chiamare index.internalPointer->parentItem() in quanto in un pie chart i dati
+    //non sono disposti in una gerarchia ad albero
 }
 
 QModelIndex PieModel::index(int row, int column, const QModelIndex &parent) const{

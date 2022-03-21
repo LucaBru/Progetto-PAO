@@ -2,7 +2,10 @@ Conteggio ore:
  - Progettazione: 7 ore
  - Modello:
     - PieChart: 10 ore
-    - LineChart:
+    - LineChart: 2.5
     - BarChart
  - Vista:
-    - PieChart: 8 ore
+    - PieChart: 11 ore
+    - LineChart: 3.5
+
+Somma totale: 34 ore
