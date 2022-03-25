@@ -1,14 +1,22 @@
 #ifndef LINECHARTWIDGET_H
 #define LINECHARTWIDGET_H
 #include "View/CentralWidget/ChartWidget/chartwidget.h"
+#include <QValueAxis>
 #include <vector>
 using std::vector;
 
 class LineChartWidget : public ChartWidget{
     Q_OBJECT
+private:
+    void connectLineModelSignals() const;
+    void connectSignals() const;
+    void configChartWidgetItems() const;
+    void configLineChartWidgetItems() const;
+    void configInitialQLineSeries();
+    void configInitialQPointFsInQLineSeries(const QModelIndex& line_index);
 protected:
     QLineEdit *line_name;
-    QList<QAbstractSeries*> lines;
+    QList<QLineSeries*> lines;
     QGroupBox *point_info;
     QFormLayout *point_info_layout;
     QComboBox *points;
@@ -17,10 +25,9 @@ protected:
     QPushButton *insert_point;
     QPushButton *remove_point;
     QModelIndex current_line_index;
-
-    void connectLineModelSignals() const;
 public:
     LineChartWidget(View *v, Model *m, QWidget *parent =nullptr);
+    void createChartFromModel() override;
 protected slots:
     void currentLine(int row);
     void userInsertLine();

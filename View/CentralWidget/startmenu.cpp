@@ -3,6 +3,8 @@
 #include <QVBoxLayout>
 #include <QJsonDocument>
 #include "View/CentralWidget/ChartWidget/piechartwidget.h"
+#include "View/CentralWidget/ChartWidget/linechartwidget.h"
+#include "Model/linemodel.h"
 
 
 StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), createfrominput(new QPushButton("create from input")), createfromfile(new QPushButton("get from file")), createfromlast(new QPushButton("get last")){
@@ -18,7 +20,8 @@ StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), creat
 }
 
 void StartMenu::createFromFile(){
-    QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
+    //QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
+    QString path = "C:\\Users\\lucab\\Desktop\\line chart 1.json";
     QFile file(path);
 
     if(file.open(QFile::ReadOnly)){
@@ -28,10 +31,14 @@ void StartMenu::createFromFile(){
             if(chart_type.compare("pie") == 0){
                 PieChartWidget *w = new PieChartWidget(view, new PieModel(view, obj));
                 view->setCentralWidget(w);
+                w->createChartFromModel(); //da implementare e tale funzione in ChartWidget deve essere pura
                 w->setCurrentChartPath(path);
             }
             else if(chart_type.compare("line") == 0){
-                //manca per linechart e barchart
+                LineChartWidget *w = new LineChartWidget(view, new LineModel(view, obj));
+                w->createChartFromModel();
+                view->setCentralWidget(w);
+                w->setCurrentChartPath(path);
             }
             else{}
         }

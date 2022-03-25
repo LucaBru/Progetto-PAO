@@ -3,20 +3,28 @@
 
 // --------------------- Point -------------------------
 
-Point::Point(Line* p, double x_x, double y_y) : parent(p), x(x_x), y(y_y){}
+Point::Point(Line* p, double x_x, double y_y) : parent(p), x(x_x), y(y_y), valid(false){}
 
-Point::Point(Line *p, const Point& point) : parent(p), x(point.x), y(point.y){}
+Point::Point(Line *p, const Point& point) : parent(p), x(point.x), y(point.y), valid(false){}
 
 ChartData* Point::parentItem() const{
     return parent;
 }
 
 const double* Point::getX() const{
-    return &x;
+    return (valid) ? &x : nullptr;
 }
 
 const double* Point::getY() const{
-    return &y;
+    return (valid) ? &y : nullptr;
+}
+
+void Point::setValid(){
+    valid = true;
+}
+
+void Point::setInvalid(){
+    valid = false;
 }
 
 void Point::setX(double new_x){
@@ -28,10 +36,23 @@ void Point::setY(double new_y){
 }
 
 QString Point::toQString() const{
-    return QString("x: " + QString::number(x) + " y: " + QString::number(y));
+    return (valid) ? QString("x: " + QString::number(x) + " y: " + QString::number(y)) : "x: y: ";
 }
 
 // --------------------- Line --------------------------
+
+bool Line::isPointsInLineValid(const QJsonObject &line){
+    QJsonArray xvalues = line.value("x values").toArray();
+    QJsonArray yvalues = line.value("y values").toArray();
+    bool is_valid = xvalues.size() == yvalues.size();
+    if(is_valid && xvalues.size() >= 2){
+        QJsonArray::const_iterator x_iter = xvalues.constBegin()+1;
+        QJsonArray::const_iterator x_prec_iter = xvalues.constBegin();
+        for(; x_iter != xvalues.constEnd() && is_valid; ++x_iter, ++ x_prec_iter)
+            is_valid = (x_prec_iter)->toDouble() < x_iter->toDouble();
+    }
+    return is_valid;
+}
 
 vector<Point*> Line::copyPoints(const Line &line, Line* to_line){
     vector<Point*> result;
@@ -45,7 +66,29 @@ void Line::destroyPoints(Line &line){
         delete *i;
 }
 
+void Line::confPointsFromQJsonObject(const QJsonObject &line){
+    //scelta progettuale: se il file viene compromesso e i 2 vettori hanno dimensione diversa oppure le x non sono in ordine strettamente          crescente => non creo nessun punto
+    if(isPointsInLineValid(line)){
+        QJsonArray xvalues = line.value("x values").toArray();
+        QJsonArray yvalues = line.value("y values").toArray();
+        QJsonArray::const_iterator x_iter = xvalues.constBegin();
+        QJsonArray::const_iterator y_iter = yvalues.constBegin();
+        for(; x_iter != xvalues.constEnd(); ++x_iter, ++y_iter){
+            Point *new_point = new Point(this, x_iter->toDouble(), y_iter->toDouble());
+            new_point->setValid();
+            points.push_back(new_point);
+        }
+    }
+}
+
 Line::Line(const QString &n) : name(n){}
+
+Line::Line(const QJsonObject& line){
+    if(!line.isEmpty()){
+        name = line.value("line name").toString();
+        confPointsFromQJsonObject(line);
+    }
+}
 
 Line::Line(const Line& line) : name(line.name), points(copyPoints(line, this)){}
 
@@ -65,13 +108,18 @@ const QString& Line::getName() const{
     return name;
 }
 
+void Line::changeName(const QString &new_name){
+    name = new_name;
+}
+
 Point* Line::getPoint(int index) const{
     return (index >= 0 && index < points.size()) ? points[index] : nullptr;
 }
 
-void Line::changeName(const QString &n){
-    name = n;
+void Line::changePointValue(int point_index, Point *new_point){
+
 }
+
 
 bool Line::insertPoints(int index, int count, double x, double y){
     if(index >= 0 && count > 0 && index <= points.size()){
@@ -98,6 +146,21 @@ int Line::getPointsCount() const{
 
 // --------------------- LineChart -----------------------
 
+void LineChart::confLinesFromQJsonObject(const QJsonArray& lines_from_json){
+    for(QJsonArray::const_iterator i = lines_from_json.constBegin(); i != lines_from_json.constEnd(); ++i){
+        if(!existLineName(i->toObject().value("line name").toString()))
+            lines.push_back(new Line(i->toObject()));
+    }
+
+}
+
+bool LineChart::existLineName(const QString &line_name) const{
+    bool exist = false;
+    for(vector<Line*>::const_iterator i = lines.begin(); i != lines.end() && !exist; ++i)
+        exist = (*i)->getName().compare(line_name, Qt::CaseInsensitive) == 0;
+    return exist;
+}
+
 vector<Line*> LineChart::copyLines(const LineChart& chart){
    vector<Line*> result;
    for(vector<Line*>::const_iterator i = chart.lines.begin(); i != chart.lines.end(); ++i)
@@ -112,7 +175,9 @@ void LineChart::destroyLines(LineChart &chart){
 
 LineChart::LineChart(const QString &t) : Chart(t){}
 
-LineChart::LineChart(const QJsonObject &obj){}
+LineChart::LineChart(const QJsonObject &obj) : Chart(obj){
+    confLinesFromQJsonObject(obj.value("lines").toArray());
+}
 
 LineChart::LineChart(const LineChart& chart) : Chart(chart), lines(copyLines(chart)){}
 
@@ -126,6 +191,12 @@ LineChart& LineChart::operator =(const LineChart& chart){
 
 LineChart::~LineChart(){
     destroyLines(*this);
+}
+
+void LineChart::changeLineName(int line_index, const QString &new_name){
+    if(line_index >= 0 && line_index < lines.size() && !existLineName(new_name))
+        lines[line_index]->changeName(new_name);
+
 }
 
 Line* LineChart::getLine(int index) const{
@@ -184,27 +255,6 @@ QJsonObject* LineChart::parsing() const{
 int LineChart::getLinesCount() const{
     return lines.size();
 }
-
-/*
- * Parsing di un chart con 2 linee con 2 punti ciascuna
- * {
- *  title : <chart_title>
- *  type : "line"
- *  lines [
- *     {
- *      line name : <line name>
- *      x values [ <1.x>, <2.x> ]
- *      y values [ <1.y>, <2.y> ]
-       },
-       {
-        line name : <line name>
-        x values [<1.x>, <2.y> ]
-        y values [ <1.y>, <2.y> ]
-       }
- *   ]
- *  }
- *
- */
 
 
 

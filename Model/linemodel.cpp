@@ -70,12 +70,14 @@ QVariant LineModel::data(const QModelIndex &index, int role) const{
             Line *current_line = c->getLine(index.parent().row());
             if(current_line && current_line->getPoint(index.row())){
                 Point *current_point = current_line->getPoint(index.row());
-                if(index.column() == 0)
-                    result = *const_cast<double*>(current_point->getX());
-                else if(index.column() == 1)
-                    result = *const_cast<double*>(current_point->getY());
-                else
-                    result = current_point->toQString();
+                if(current_point){
+                    if(index.column() == 0 && current_point->getX())
+                        result = *const_cast<double*>(current_point->getX());
+                    else if(index.column() == 1 && current_point->getY())
+                        result = *const_cast<double*>(current_point->getY());
+                    else
+                        result = current_point->toQString();
+                }
             }
         }
     }
@@ -87,13 +89,11 @@ bool LineModel::setData(const QModelIndex &index, const QVariant &value, int rol
     LineChart *c = dynamic_cast<LineChart*>(chart);
     if(c){
         if(!index.parent().isValid()){
-            Line *current_line = c->getLine(index.row());
-            if(current_line){
-                current_line->changeName(value.toString());
-                result = true;
-                emit dataChanged(index, index);
-                emit lineAtChangedName(index.row(), value.toString());
-            }
+            c->changeLineName(index.row(), value.toString());
+            //cambia sse il nuovo nome è univoco
+            result = true;
+            emit dataChanged(index, index);
+            emit lineAtChangedName(index.row(), value.toString());
         }
         else{
             Point *current_point = (c->getLine(index.parent().row())) ? c->getLine(index.parent().row())->getPoint(index.row()) : nullptr;
@@ -115,17 +115,6 @@ bool LineModel::setData(const QModelIndex &index, const QVariant &value, int rol
     }
     return result;
 }
-
-/*
- * grosso problema:
- *  - data potrebbe anche essere di tipo double* (e non solo ChartData*)
- *  Possibile soluzione:
- *  - unica soluzione che mi viene in mente è utilizzare Point come ultimo elemento della gerarchia di dati (Point è un ChartData), set Data e Data ritorneranno un QVariant costruito passando un QPointF come paremetro (costruttore di variant esistente). Il modello assume così un struttura ad albero (composta da righe di una colonna in diverse gerarchie)
- * Incognite: come visualizza points un QPointF? (teoricamnente con una stringa vuota) <- trovare una soluzione a questo problema
- * Possibile soluzione: se è un point_x oppure point_y allora ha per forza un fratello => riesco a trovare il tipo
- * Altrimenti posso lavorare a livello di point
- *
- */
 
 QModelIndex LineModel::parent(const QModelIndex &child) const{
     if(child.isValid()){

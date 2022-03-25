@@ -55,8 +55,8 @@ void PieChartWidget::userChangeSliceValue(){
 }
 
 void PieChartWidget::userInsertSlice(){
-    int current_index = series->currentIndex();
-    model->insertRows((current_index == -1) ? 0 : current_index, 1, QModelIndex());
+    int current_index = series->currentIndex()+1;
+    model->insertRows(current_index, 1, QModelIndex());
 }
 
 void PieChartWidget::userRemoveSlice() {

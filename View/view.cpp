@@ -7,7 +7,7 @@
 #include "Model/linemodel.h"
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()){
-   setCentralWidget(new LineChartWidget(this, new LineModel(this)));
+   setCentralWidget(new StartMenu(this));
 }
 
 View::~View(){

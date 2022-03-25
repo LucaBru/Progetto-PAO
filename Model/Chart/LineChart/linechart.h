@@ -10,12 +10,15 @@ class Point : public ChartData{
 private:
     Line *parent;
     double x, y;
+    bool valid;
 public:
     Point(Line* parent, double x =0, double y =0);
-    Point(Line* parent, const Point& p);
+    Point(Line* parent, const Point&);
     //costruttore di copia raddoppia la linea creando cosi una linea con il doppio degli elementi, tutti ripetuti 2 volte
     const double* getX() const;
     const double* getY() const;
+    void setValid();
+    void setInvalid();
     void setX(double new_x);
     void setY(double new_y);
     QString toQString() const;
@@ -30,8 +33,11 @@ private:
 
     static vector<Point*> copyPoints(const Line& line, Line* to_line);
     static void destroyPoints(Line& line);
+    static bool isPointsInLineValid(const QJsonObject& line);
+    void confPointsFromQJsonObject(const QJsonObject& line);
 public:
     Line(const QString& name = QString());
+    Line(const QJsonObject& line);
 
     //gestione della memoria profonda
     Line(const Line& line);
@@ -39,14 +45,19 @@ public:
     ~Line();
 
     const QString& getName() const;
+    void changeName(const QString& new_name);
     Point* getPoint(int index) const;
-    void changeName(const QString& name);
+    void changePointValue(int point_index, Point* new_point); //da fare
     bool insertPoints(int index, int count, double x =0, double y =0);
     bool removePoints(int index, int count);
     int getPointsCount() const;
 };
 
 class LineChart : public Chart{
+private:
+    //inserisce la linea solamnete se il nome è valido (ovvero se non ci sono altre linee con tale nome)
+    void confLinesFromQJsonObject(const QJsonArray& lines_from_json);
+    bool existLineName(const QString& line_name) const;
 protected:
     vector<Line*> lines;
 
@@ -54,12 +65,14 @@ protected:
     static void destroyLines(LineChart& chart);
 public:
     LineChart(const QString& t =QString());
-    LineChart(const QJsonObject& obj); //Da fare
+    LineChart(const QJsonObject& obj);
 
     //gestione della memoria profonda
     LineChart(const LineChart& chart);
     LineChart& operator=(const LineChart& chart);
     ~LineChart();
+
+    void changeLineName(int line_index, const QString& new_name);
     Line* getLine(int index) const;
     //contratto getLineIndex(const Line* line) ritorna l'indice di line all'interno di lines se esiste, -1 altrimenti
     int getLineIndex(const Line* line) const;

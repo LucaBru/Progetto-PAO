@@ -13,6 +13,9 @@
 
 class ChartWidget : public CentralWidget{
     Q_OBJECT
+private:
+    void connectSignalsAndSlot() const;
+    void configChartWidgetItems() const;
 protected:
     Model *model;
     QGroupBox *chart_info;
@@ -32,6 +35,7 @@ protected:
 public:
     ChartWidget(View *v, Model * m, QWidget *parent =nullptr);
     void setCurrentChartPath(const QString& path);
+    virtual void createChartFromModel(); //si occupa solo di impostare il titolo
     ~ChartWidget();
 private slots:
     void changeTitle();

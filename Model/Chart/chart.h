@@ -7,6 +7,7 @@
 class ChartData{
 public:
     virtual ChartData* parentItem() const;
+    virtual ~ChartData() =default;
 };
 
 class Chart{
