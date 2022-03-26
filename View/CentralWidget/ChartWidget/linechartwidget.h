@@ -24,6 +24,7 @@ protected:
     QLineEdit *point_y_value;
     QPushButton *insert_point;
     QPushButton *remove_point;
+    QPushButton *remove_all_points;
     QModelIndex current_line_index;
 public:
     LineChartWidget(View *v, Model *m, QWidget *parent =nullptr);
@@ -36,8 +37,8 @@ protected slots:
     void currentPoint(int row);
     void userInsertPoint();
     void userRemovePoint();
-    void userChangeXPointValue();
-    void userChangeYPointValue();
+    void userRemoveAllPoints();
+    void userChangePointValue();
     void lineAtChangedName(int line_row, const QString& new_name);
     void multipleLinesInserted(int row, int count);
     void multipleLinesRemoved(int row, int count);

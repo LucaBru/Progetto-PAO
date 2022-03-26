@@ -11,15 +11,9 @@ void PieChartWidget::connectPieModelSignals() const{
     }
 }
 
-void PieChartWidget::checkInitialChartValues(){
-    int slices_count = model->rowCount();
-    for(int i=0; i < slices_count; ++i)
-        slices->insert(i, new QPieSlice(series->itemText(i), model->data(model->index(i, 1)).toDouble()));
-}
 
 PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), slice_name(new QLineEdit()), slice_value(new QLineEdit()), slice_color(new QLineEdit()), slices(new QPieSeries()){
 
-    checkInitialChartValues();
     chart->addSeries(slices);
     slice_name->setPlaceholderText("none");
     slice_value->setValidator(new QDoubleValidator(this));
@@ -40,6 +34,13 @@ PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSlice(int)));
 
     connectPieModelSignals();
+}
+
+void PieChartWidget::createChartFromModel(){
+    ChartWidget::createChartFromModel();
+    int slices_count = model->rowCount();
+    for(int i=0; i < slices_count; ++i)
+        slices->insert(i, new QPieSlice(series->itemText(i), model->data(model->index(i, 1)).toDouble()));
 }
 
 void PieChartWidget::userChangeSliceName(){

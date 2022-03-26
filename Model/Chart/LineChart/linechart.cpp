@@ -19,6 +19,10 @@ const double* Point::getY() const{
     return (valid) ? &y : nullptr;
 }
 
+bool Point::isValid() const{
+    return valid;
+}
+
 void Point::setValid(){
     valid = true;
 }
@@ -64,6 +68,24 @@ vector<Point*> Line::copyPoints(const Line &line, Line* to_line){
 void Line::destroyPoints(Line &line){
     for(vector<Point*>::iterator i = line.points.begin(); i != line.points.end(); ++i)
         delete *i;
+}
+
+Point* Line::findFirstValidPointBefore(int point_index) const{
+    Point *result = nullptr;
+    if(point_index > 0 && point_index < points.size()){
+        for(int i = point_index-1; i >= 0 && !result ; --i)
+            result = (points[i]->isValid()) ? points[i] : nullptr;
+    }
+    return result;
+}
+
+Point* Line::findFirstValidPointAfter(int point_index) const{
+    Point * result = nullptr;
+    if(point_index >= 0 && point_index < points.size()-1){
+        for(int i = point_index+1; i < points.size() && !result; ++i)
+            result = points[i]->isValid() ? points[i] : nullptr;
+    }
+    return result;
 }
 
 void Line::confPointsFromQJsonObject(const QJsonObject &line){
@@ -116,10 +138,20 @@ Point* Line::getPoint(int index) const{
     return (index >= 0 && index < points.size()) ? points[index] : nullptr;
 }
 
-void Line::changePointValue(int point_index, Point *new_point){
-
+bool Line::isPointNewXValueCorrect(int point_index, double new_x_value) const{
+    Point *before = findFirstValidPointBefore(point_index);
+    bool b = (before) ? *before->getX() < new_x_value : true;
+    Point *after = findFirstValidPointAfter(point_index);
+    bool a = (after) ? *after->getX() > new_x_value : true;
+    return b && a;
 }
 
+void Line::changeXPointValue(int point_index, double new_x_value){
+    if(isPointNewXValueCorrect(point_index, new_x_value)){
+        points[point_index]->setX(new_x_value);
+        points[point_index]->setValid();
+    }
+}
 
 bool Line::insertPoints(int index, int count, double x, double y){
     if(index >= 0 && count > 0 && index <= points.size()){
@@ -193,10 +225,13 @@ LineChart::~LineChart(){
     destroyLines(*this);
 }
 
-void LineChart::changeLineName(int line_index, const QString &new_name){
-    if(line_index >= 0 && line_index < lines.size() && !existLineName(new_name))
+bool LineChart::changeLineName(int line_index, const QString &new_name){
+    bool result = false;
+    if(line_index >= 0 && line_index < lines.size() && !existLineName(new_name)){
         lines[line_index]->changeName(new_name);
-
+        result = true;
+    }
+    return result;
 }
 
 Line* LineChart::getLine(int index) const{
@@ -240,8 +275,11 @@ QJsonObject* LineChart::parsing() const{
         QJsonArray x_values;
         QJsonArray y_values;
         for(int j=0; j < points_in_line; ++j){
-            x_values.push_back(*(*i)->getPoint(j)->getX());
-            y_values.push_back(*(*i)->getPoint(j)->getY());
+            Point *current_point = (*i)->getPoint(j);
+            if(current_point->isValid()){
+                x_values.push_back(*current_point->getX());
+                y_values.push_back(*current_point->getY());
+            }
         }
         current_line.insert("x values", x_values);
         current_line.insert("y values", y_values);
@@ -255,8 +293,3 @@ QJsonObject* LineChart::parsing() const{
 int LineChart::getLinesCount() const{
     return lines.size();
 }
-
-
-
-
-

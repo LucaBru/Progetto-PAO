@@ -35,7 +35,7 @@ protected:
 public:
     ChartWidget(View *v, Model * m, QWidget *parent =nullptr);
     void setCurrentChartPath(const QString& path);
-    virtual void createChartFromModel(); //si occupa solo di impostare il titolo
+    virtual void createChartFromModel();
     ~ChartWidget();
 private slots:
     void changeTitle();

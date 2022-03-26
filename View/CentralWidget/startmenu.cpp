@@ -20,8 +20,7 @@ StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), creat
 }
 
 void StartMenu::createFromFile(){
-    //QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
-    QString path = "C:\\Users\\lucab\\Desktop\\line chart 1.json";
+    QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
     QFile file(path);
 
     if(file.open(QFile::ReadOnly)){
@@ -31,7 +30,7 @@ void StartMenu::createFromFile(){
             if(chart_type.compare("pie") == 0){
                 PieChartWidget *w = new PieChartWidget(view, new PieModel(view, obj));
                 view->setCentralWidget(w);
-                w->createChartFromModel(); //da implementare e tale funzione in ChartWidget deve essere pura
+                w->createChartFromModel();
                 w->setCurrentChartPath(path);
             }
             else if(chart_type.compare("line") == 0){

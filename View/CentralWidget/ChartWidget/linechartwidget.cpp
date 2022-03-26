@@ -23,8 +23,9 @@ void LineChartWidget::connectSignals() const{
     QObject::connect(insert_point, SIGNAL(clicked()), this, SLOT(userInsertPoint()));
     QObject::connect(remove_point, SIGNAL(clicked()), this, SLOT(userRemovePoint()));
     QObject::connect(line_name, SIGNAL(editingFinished()), this, SLOT(userChangeLineName()));
-    QObject::connect(point_x_value, SIGNAL(editingFinished()), this, SLOT(userChangeXPointValue()));
-    QObject::connect(point_y_value, SIGNAL(editingFinished()), this, SLOT(userChangeYPointValue()));
+    QObject::connect(point_x_value, SIGNAL(editingFinished()), this, SLOT(userChangePointValue()));
+    QObject::connect(point_y_value, SIGNAL(editingFinished()), this, SLOT(userChangePointValue()));
+    QObject::connect(remove_all_points, SIGNAL(clicked(bool)), this, SLOT(userRemoveAllPoints()));
 
     connectLineModelSignals();
 }
@@ -36,7 +37,6 @@ void LineChartWidget::configChartWidgetItems() const{
     remove_serie->setText("Remove Line");
     save_chart->setText("Save Line Chart");
     save_chart_as->setText("Save Line Chart as");
-    line_name->setPlaceholderText("<none>");
 }
 
 void LineChartWidget::configLineChartWidgetItems() const{
@@ -47,7 +47,8 @@ void LineChartWidget::configLineChartWidgetItems() const{
     point_info_layout->addRow("Y value", point_y_value);
     point_info_layout->addRow("Add Point", insert_point);
     point_info_layout->addRow("Remove Point", remove_point);
-    point_x_value->setPlaceholderText("0");
+    point_info_layout->addRow("Remove All Points", remove_all_points);
+    point_x_value->setPlaceholderText("");
     point_y_value->setPlaceholderText("0");
     QDoubleValidator *double_val = new QDoubleValidator(const_cast<LineChartWidget*>(this));
     double_val->setDecimals(6);
@@ -79,7 +80,7 @@ void LineChartWidget::configInitialQPointFsInQLineSeries(const QModelIndex& line
     }
 }
 
-LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")){
+LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")), remove_all_points(new QPushButton("Remove All Points")){
 
     chart_view->setRenderHint(QPainter::Antialiasing);
     configChartWidgetItems();
@@ -97,23 +98,29 @@ void LineChartWidget::createChartFromModel(){
 void LineChartWidget::currentLine(int row){
     if(row != -1){
         current_line_index = model->index(row, 0);
-        line_name->setText(model->data(current_line_index).toString());
+        line_name->setText(series->currentText());
         points->setModel(model);
         points->setRootModelIndex(current_line_index);
+        points->setCurrentIndex(-1);
         points->setModelColumn(2);
+    }
+    else{
+        current_line_index = QModelIndex();
+        points->setCurrentIndex(-1);
     }
 }
 
 void LineChartWidget::userInsertLine(){
     int row = series->currentIndex()+1;
     model->insertRows(row, 1);
+    series->setCurrentIndex(row);
 }
 
 void LineChartWidget::userRemoveLine(){
     int row = series->currentIndex();
     if(row != -1){
+        line_name->setText("");
         model->removeRows(row, 1);
-        current_line_index = QModelIndex();
     }
 }
 
@@ -123,8 +130,14 @@ void LineChartWidget::userChangeLineName(){
 }
 
 void LineChartWidget::currentPoint(int index){
-    point_x_value->setText(model->data(model->index(points->currentIndex(), 0, current_line_index)).toString());
-    point_y_value->setText(model->data(model->index(points->currentIndex(), 1, current_line_index)).toString());
+    if(current_line_index.isValid() && index != -1){
+        point_x_value->setText(model->data(model->index(points->currentIndex(), 0, current_line_index)).toString());
+        point_y_value->setText(model->data(model->index(points->currentIndex(), 1, current_line_index)).toString());
+    }
+    else{
+        point_x_value->setText("");
+        point_y_value->setText("");
+    }
 }
 
 void LineChartWidget::lineAtChangedName(int line_row, const QString &new_name){
@@ -135,6 +148,7 @@ void LineChartWidget::userInsertPoint(){
     if(current_line_index.isValid()){
         int row = points->currentIndex()+1;
         model->insertRows(row, 1, current_line_index);
+        points->setCurrentIndex(row);
     }
 }
 
@@ -147,17 +161,29 @@ void LineChartWidget::userRemovePoint(){
     }
 }
 
-void LineChartWidget::userChangeXPointValue(){
-    int row = points->currentIndex();
-    if(current_line_index.isValid() && row != -1)
-        model->setData(model->index(row, 0, current_line_index), point_x_value->text().toDouble());
+void LineChartWidget::userRemoveAllPoints(){
+        if(current_line_index.isValid()){
+        QMessageBox *user_confirm = new QMessageBox();
+        user_confirm->setText("Are you sure you want to delete all points of line '"+series->currentText()+"' ?");
+        user_confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No);
+        user_confirm->setDefaultButton(QMessageBox::No);
+        int ret = user_confirm->exec();
+        if(ret == QMessageBox::Yes)
+            model->removeRows(0, points->count(), current_line_index);
+        }
+
 }
 
-void LineChartWidget::userChangeYPointValue(){
+void LineChartWidget::userChangePointValue(){
     int row = points->currentIndex();
-    if(current_line_index.isValid() && row != -1)
-        model->setData(model->index(row, 1, current_line_index), point_y_value->text().toDouble());
+    if(current_line_index.isValid() && row != -1){
+        double x_val = point_x_value->text().toDouble();
+        double y_val = point_y_value->text().toDouble();
+        model->setData(model->index(row, 0, current_line_index), x_val);
+        model->setData(model->index(row, 1, current_line_index), y_val);
+    }
 }
+
 
 void LineChartWidget::multipleLinesInserted(int row, int count){
     for(int i = 0; i < count; ++i){
@@ -175,15 +201,25 @@ void LineChartWidget::multipleLinesRemoved(int row, int count){
 }
 
 void LineChartWidget::multiplePointsAtLineInserted(int line_row, int point_row, int count){
-    for(int i = 0; i < count; ++i);
-       lines[line_row]->insert(point_row, QPointF());
+    int default_value_from_index = -1;
+    int points_size = lines[line_row]->count();
+    if(points_size > 0){
+        if(point_row == 0)
+            default_value_from_index = 1;
+        else
+            default_value_from_index = point_row-1;
+    }
+
+    double x_default_value = (default_value_from_index == -1) ? 0 : lines[line_row]->at(default_value_from_index).x();
+    double y_default_value = (default_value_from_index == -1) ? 0 : lines[line_row]->at(default_value_from_index).y();
+
+    for(int i = 0; i < count; ++i)
+        lines[line_row]->insert(point_row+i, QPointF(x_default_value, y_default_value));
     chart->createDefaultAxes();
 }
 
 void LineChartWidget::multiplePointsAtLineRemoved(int line_row, int point_row, int count){
-    QLineSeries *current_line = lines[line_row];
-    for(int i = 0; i < count; ++i)
-       current_line->removePoints(point_row, count);
+    lines[line_row]->removePoints(point_row, count);
     chart->createDefaultAxes();
 }
 

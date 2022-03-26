@@ -4,6 +4,13 @@
 
 class LineModel : public Model{
     Q_OBJECT
+private:
+    bool changeLineName(const QModelIndex& line_index, const QString& new_line_name);
+    //pre condizioni: chart è LineChart e index si riferisce ad un Point => index.parent.isValid() == true
+    bool changeXPointValue(const QModelIndex& point_index, double new_x_value);
+    bool changeYPointValue(const QModelIndex& point_index, double new_y_value);
+    bool changePointValue(const QModelIndex& index, double value);
+    QVariant getPointValue(const QModelIndex& index) const;
 public:
     LineModel(View *v, const QJsonObject& obj = QJsonObject(), QObject *parent =nullptr);
     int rowCount(const QModelIndex &parent) const override;

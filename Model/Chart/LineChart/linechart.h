@@ -17,6 +17,7 @@ public:
     //costruttore di copia raddoppia la linea creando cosi una linea con il doppio degli elementi, tutti ripetuti 2 volte
     const double* getX() const;
     const double* getY() const;
+    bool isValid() const;
     void setValid();
     void setInvalid();
     void setX(double new_x);
@@ -34,6 +35,9 @@ private:
     static vector<Point*> copyPoints(const Line& line, Line* to_line);
     static void destroyPoints(Line& line);
     static bool isPointsInLineValid(const QJsonObject& line);
+    bool isPointNewXValueCorrect(int point_index, double new_x_value) const;
+    Point* findFirstValidPointBefore(int point_index) const;
+    Point* findFirstValidPointAfter(int point_index) const;
     void confPointsFromQJsonObject(const QJsonObject& line);
 public:
     Line(const QString& name = QString());
@@ -47,7 +51,7 @@ public:
     const QString& getName() const;
     void changeName(const QString& new_name);
     Point* getPoint(int index) const;
-    void changePointValue(int point_index, Point* new_point); //da fare
+    void changeXPointValue(int point_index, double new_x_value);
     bool insertPoints(int index, int count, double x =0, double y =0);
     bool removePoints(int index, int count);
     int getPointsCount() const;
@@ -72,7 +76,7 @@ public:
     LineChart& operator=(const LineChart& chart);
     ~LineChart();
 
-    void changeLineName(int line_index, const QString& new_name);
+    bool changeLineName(int line_index, const QString& new_name);
     Line* getLine(int index) const;
     //contratto getLineIndex(const Line* line) ritorna l'indice di line all'interno di lines se esiste, -1 altrimenti
     int getLineIndex(const Line* line) const;

@@ -1,6 +1,76 @@
 #include "linemodel.h"
 #include "Model/Chart/LineChart/linechart.h"
 
+bool LineModel::changeLineName(const QModelIndex &line_index, const QString &new_line_name){
+    bool result = false;
+    LineChart *c = dynamic_cast<LineChart*>(chart);
+    Line *line = dynamic_cast<Line*>(static_cast<ChartData*>(line_index.internalPointer()));
+    if(c && line){
+        result = c->changeLineName(line_index.row(), new_line_name);
+        if(result){
+            emit dataChanged(line_index, line_index);
+            emit lineAtChangedName(line_index.row(), new_line_name);
+        }
+
+    }
+    return result;
+}
+
+bool LineModel::changeXPointValue(const QModelIndex &point_index, double new_x_value){
+    bool result = false;
+    Point *point = dynamic_cast<Point*>(static_cast<ChartData*>(point_index.internalPointer()));
+    if(point){
+        Line *parent = static_cast<Line*>(point->parentItem());
+        parent->changeXPointValue(point_index.row(), new_x_value);
+        if(point->isValid()){
+            result = true;
+            emit pointAtLineChanged(point_index.parent().row(), point_index.row(), new_x_value, *point->getY());
+        }
+        emit dataChanged(point_index, point_index);
+
+    }
+    return result;
+}
+
+bool LineModel::changeYPointValue(const QModelIndex &point_index, double new_y_value){
+    bool result = false;
+    Point *point = dynamic_cast<Point*>(static_cast<ChartData*>(point_index.internalPointer()));
+    if(point && point->isValid()){
+        point->setY(new_y_value);
+        if(point->isValid()){
+            result = true;
+            emit pointAtLineChanged(point_index.parent().row(), point_index.row(), *point->getX(), new_y_value);
+        }
+    }
+    return result;
+
+}
+
+bool LineModel::changePointValue(const QModelIndex &index, double value){
+    bool result = false;
+    if(index.isValid()){
+        if(index.column() == 0)
+            result = changeXPointValue(index, value);
+        else if(index.column() == 1)
+            result = changeYPointValue(index, value);
+    }
+    return result;
+}
+
+QVariant LineModel::getPointValue(const QModelIndex &index) const{
+    QVariant result;
+    Point *point = dynamic_cast<Point*>(static_cast<ChartData*>(index.internalPointer()));
+    if(point){
+        if(index.column() == 0)
+            result = (point->getX()) ? *const_cast<double*>(point->getX()) : QVariant();
+        else if(index.column() == 1)
+            result = (point->getY()) ? *const_cast<double*>(point->getY()) : QVariant();
+        else
+            result = point->toQString();
+    }
+    return result;
+}
+
 LineModel::LineModel(View *v, const QJsonObject& obj, QObject *parent) : Model(v, ((obj.isEmpty()) ? new LineChart() : new LineChart(obj)), parent){}
 
 int LineModel::rowCount(const QModelIndex &parent) const{
@@ -60,59 +130,23 @@ bool LineModel::removeRows(int row, int count, const QModelIndex &parent){
 
 QVariant LineModel::data(const QModelIndex &index, int role) const{
     QVariant result;
-    LineChart *c = dynamic_cast<LineChart*>(chart);
-    if(c && role == Qt::DisplayRole){
-        if(!index.parent().isValid()){
-            if(c->getLine(index.row()))
-                result = c->getLine(index.row())->getName();
-        }
-        else{
-            Line *current_line = c->getLine(index.parent().row());
-            if(current_line && current_line->getPoint(index.row())){
-                Point *current_point = current_line->getPoint(index.row());
-                if(current_point){
-                    if(index.column() == 0 && current_point->getX())
-                        result = *const_cast<double*>(current_point->getX());
-                    else if(index.column() == 1 && current_point->getY())
-                        result = *const_cast<double*>(current_point->getY());
-                    else
-                        result = current_point->toQString();
-                }
-            }
-        }
+    if(role == Qt::DisplayRole){
+        Line *line = dynamic_cast<Line*>(static_cast<ChartData*>(index.internalPointer()));
+        if(line)
+            result = line->getName();
+        else
+            result = getPointValue(index);
     }
     return result;
 }
 
 bool LineModel::setData(const QModelIndex &index, const QVariant &value, int role){
     bool result = false;
-    LineChart *c = dynamic_cast<LineChart*>(chart);
-    if(c){
-        if(!index.parent().isValid()){
-            c->changeLineName(index.row(), value.toString());
-            //cambia sse il nuovo nome è univoco
-            result = true;
-            emit dataChanged(index, index);
-            emit lineAtChangedName(index.row(), value.toString());
-        }
-        else{
-            Point *current_point = (c->getLine(index.parent().row())) ? c->getLine(index.parent().row())->getPoint(index.row()) : nullptr;
-            if(current_point){
-                if(index.column() == 0){
-                    current_point->setX(value.toDouble());
-                    result = true;
-                    emit dataChanged(index, index);
-                    emit pointAtLineChanged(index.parent().row(), index.row(), value.toDouble(), *current_point->getY());
-                }
-                else if(index.column() == 1){
-                    current_point->setY(value.toDouble());
-                    result = true;
-                    emit dataChanged(index, index);
-                    emit pointAtLineChanged(index.parent().row(), index.row(), *current_point->getX(), value.toDouble());
-                }
-            }
-        }
-    }
+    if(index.isValid())
+        if(!index.parent().isValid())
+            result = changeLineName(index, value.toString());
+        else
+            result = changePointValue(index, value.toDouble());
     return result;
 }
 
@@ -134,20 +168,13 @@ QModelIndex LineModel::parent(const QModelIndex &child) const{
 
 QModelIndex LineModel::index(int row, int column, const QModelIndex &parent) const{
     QModelIndex i;
+    Line *line = dynamic_cast<Line*>(static_cast<ChartData*>(parent.internalPointer()));
     LineChart *c = dynamic_cast<LineChart*>(chart);
     if(c){
-        if(!parent.isValid() && column == 0){
-            Line *current_line = c->getLine(row);
-            if(current_line)
-                i = createIndex(row, column, current_line);
-        }
-        else{
-            Line *current_line = c->getLine(parent.row());
-            if(current_line){
-                Point *current_point = current_line->getPoint(row);
-                i = createIndex(row, column, current_point);
-            }
-        }
+        if(!line && column == 0 && c->getLine(row))
+            i = createIndex(row, column, c->getLine(row));
+        else if(line && line->getPoint(row))
+            i = createIndex(row, column, line->getPoint(row));
     }
     return i;
 }

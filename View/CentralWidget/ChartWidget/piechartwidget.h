@@ -12,9 +12,9 @@ protected:
     QLineEdit *slice_color;
 
     void connectPieModelSignals() const;
-    void checkInitialChartValues();
 public:
     PieChartWidget(View *v, Model *m, QWidget *parent =nullptr);
+    void createChartFromModel() override;
 protected slots:
     void userChangeSliceName();
     void userChangeSliceValue();
