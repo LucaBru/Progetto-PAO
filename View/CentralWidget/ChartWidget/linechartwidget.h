@@ -14,6 +14,7 @@ private:
     void configLineChartWidgetItems() const;
     void configInitialQLineSeries();
     void configInitialQPointFsInQLineSeries(const QModelIndex& line_index);
+    void updateChartAxes();
 protected:
     QLineEdit *line_name;
     QList<QLineSeries*> lines;

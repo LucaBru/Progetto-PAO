@@ -81,6 +81,14 @@ void LineChartWidget::configInitialQPointFsInQLineSeries(const QModelIndex& line
     }
 }
 
+void LineChartWidget::updateChartAxes(){
+    for(QList<QLineSeries*>::const_iterator i = lines.constBegin(); i != lines.constEnd(); ++i){
+        chart->removeSeries(*i);
+        chart->addSeries(*i);
+    }
+    chart->createDefaultAxes();
+}
+
 LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")), remove_all_points(new QPushButton("Remove All Points")){
 
     chart_view->setRenderHint(QPainter::Antialiasing);
@@ -160,16 +168,15 @@ void LineChartWidget::userRemovePoint(){
 }
 
 void LineChartWidget::userRemoveAllPoints(){
-        if(current_line_index.isValid()){
+        if(current_line_index.isValid() && series->currentIndex() != -1 && points->count() > 0){
         QMessageBox *user_confirm = new QMessageBox();
         user_confirm->setText("Are you sure you want to delete all points of line '"+series->currentText()+"' ?");
         user_confirm->setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes | QMessageBox::No);
         user_confirm->setDefaultButton(QMessageBox::No);
         int ret = user_confirm->exec();
         if(ret == QMessageBox::Yes)
-            model->removeRows(0, points->count(), current_line_index);
+         model->removeRows(0, points->count(), current_line_index);
         }
-
 }
 
 void LineChartWidget::userChangePointValue(){
@@ -195,7 +202,7 @@ void LineChartWidget::multipleLinesRemoved(int row, int count){
     for(int i = 0; i < count; ++i)
         chart->removeSeries(lines[row+i]);
     lines.erase(lines.begin()+row, lines.begin()+row+count);
-    chart->createDefaultAxes();
+   updateChartAxes();
 }
 
 void LineChartWidget::multiplePointsAtLineInserted(int line_row, int point_row, int count){
@@ -213,19 +220,14 @@ void LineChartWidget::multiplePointsAtLineInserted(int line_row, int point_row, 
 
     for(int i = 0; i < count; ++i)
         lines[line_row]->insert(point_row+i, QPointF(x_default_value, y_default_value));
-    chart->createDefaultAxes();
 }
 
 void LineChartWidget::multiplePointsAtLineRemoved(int line_row, int point_row, int count){
     lines[line_row]->removePoints(point_row, count);
-    chart->createDefaultAxes();
+    updateChartAxes();
 }
 
 void LineChartWidget::pointAtLineChanged(int line_row, int row, double new_x, double new_y){
-    //ordine ed operazioni insolite richieste da un'anomalia di qt per la gestione dei valori degli assi
-    QLineSeries *current_line = lines[line_row];
-    chart->removeSeries(current_line);
-    current_line->replace(row, new_x, new_y);
-    chart->addSeries(current_line);
-    chart->createDefaultAxes();
+    lines[line_row]->replace(row, new_x, new_y);
+    updateChartAxes();
 }
