@@ -8,6 +8,6 @@ int main(int argc, char *argv[]){
     return a.exec();
 }
 /*
- * pulizia del codice in line model perchè è un bel casi
+ * Line Model problema assi da risolvere
  */
 

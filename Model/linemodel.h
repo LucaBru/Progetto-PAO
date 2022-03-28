@@ -11,6 +11,10 @@ private:
     bool changeYPointValue(const QModelIndex& point_index, double new_y_value);
     bool changePointValue(const QModelIndex& index, double value);
     QVariant getPointValue(const QModelIndex& index) const;
+    bool insertLines(int row, int count);
+    bool insertPointsInLine(int row, int count, const QModelIndex& line_parent);
+    bool removeLines(int row, int count);
+    bool removePointsInLine(int row, int count, const QModelIndex& line_parent);
 public:
     LineModel(View *v, const QJsonObject& obj = QJsonObject(), QObject *parent =nullptr);
     int rowCount(const QModelIndex &parent) const override;

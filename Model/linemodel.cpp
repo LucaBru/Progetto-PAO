@@ -71,6 +71,58 @@ QVariant LineModel::getPointValue(const QModelIndex &index) const{
     return result;
 }
 
+bool LineModel::insertLines(int row, int count){
+    LineChart *c = dynamic_cast<LineChart*>(chart);
+    bool result = false;
+    if(c){
+        beginInsertRows(QModelIndex(), row, row+count-1);
+        result = c->insertLines(row, count);
+        if(result)
+            emit insertMultipleLines(row, count);
+        endInsertRows();
+    }
+    return result;
+}
+
+bool LineModel::insertPointsInLine(int row, int count, const QModelIndex &line_parent){
+    Line *parent = dynamic_cast<Line*>(static_cast<ChartData*>(line_parent.internalPointer()));
+    bool result = false;
+    if(parent){
+        beginInsertRows(line_parent, row, row+count-1);
+        result = parent->insertPoints(row, count);
+        if(result)
+            emit insertMultiplePointsAtLine(line_parent.row(), row, count);
+        endInsertRows();
+    }
+    return result;
+}
+
+bool LineModel::removeLines(int row, int count){
+    bool result = false;
+    LineChart *c = dynamic_cast<LineChart*>(chart);
+    if(c){
+        beginRemoveRows(QModelIndex(), row, row+count-1);
+        result = c->removeLines(row, count);
+        if(result)
+            emit removeMultipleLines(row, count);
+        endRemoveRows();
+    }
+    return result;
+}
+
+bool LineModel::removePointsInLine(int row, int count, const QModelIndex &line_parent){
+    Line *parent = dynamic_cast<Line*>(static_cast<ChartData*>(line_parent.internalPointer()));
+    bool result = false;
+    if(parent){
+        beginRemoveRows(line_parent, row, row+count-1);
+        result = parent->removePoints(row, count);
+        if(result)
+            emit removeMultiplePointsAtLine(line_parent.row(), row, count);
+        endRemoveRows();
+    }
+    return result;
+}
+
 LineModel::LineModel(View *v, const QJsonObject& obj, QObject *parent) : Model(v, ((obj.isEmpty()) ? new LineChart() : new LineChart(obj)), parent){}
 
 int LineModel::rowCount(const QModelIndex &parent) const{
@@ -87,45 +139,15 @@ int LineModel::columnCount(const QModelIndex &parent) const{
 }
 
 bool LineModel::insertRows(int row, int count, const QModelIndex &parent){
-    bool result = false;
-    LineChart *c = dynamic_cast<LineChart*>(chart);
-    if(c){
-        beginInsertRows(parent, row, row+count-1);
-        if(!parent.isValid()){
-            result = c->insertLines(row, count);
-            if(result)
-                emit insertMultipleLines(row, count);
-        }
-        else{
-            Line *current_line = c->getLine(parent.row());
-            result = (current_line) ? current_line->insertPoints(row, count) : false;
-            if(result)
-                emit insertMultiplePointsAtLine(parent.row(), row, count);
-        }
-        endInsertRows();
-    }
-    return result;
+    if(dynamic_cast<Line*>(static_cast<ChartData*>(parent.internalPointer())))
+        return insertPointsInLine(row, count, parent);
+    return insertLines(row, count);
 }
 
 bool LineModel::removeRows(int row, int count, const QModelIndex &parent){
-    bool result = false;
-    LineChart *c = dynamic_cast<LineChart*>(chart);
-    if(c){
-        beginRemoveRows(parent, row, row+count-1);
-        if(!parent.isValid()){
-            result = c->removeLines(row, count);
-            if(result)
-                emit removeMultipleLines(row, count);
-        }
-        else{
-            Line *current_line = c->getLine(parent.row());
-            result = (current_line) ? current_line->removePoints(row, count) : false;
-            if(result)
-                emit removeMultiplePointsAtLine(parent.row(), row, count);
-        }
-        endRemoveRows();
-    }
-    return result;
+    if(dynamic_cast<Line*>(static_cast<ChartData*>(parent.internalPointer())))
+        return removePointsInLine(row, count, parent);
+    return removeLines(row, count);
 }
 
 QVariant LineModel::data(const QModelIndex &index, int role) const{
@@ -151,19 +173,18 @@ bool LineModel::setData(const QModelIndex &index, const QVariant &value, int rol
 }
 
 QModelIndex LineModel::parent(const QModelIndex &child) const{
-    if(child.isValid()){
-        Point *point = dynamic_cast<Point*>(static_cast<ChartData*>(child.internalPointer()));
-        LineChart *c = dynamic_cast<LineChart*>(chart);
-        if(c && point){
-            Line * parent_line = (dynamic_cast<Line*>(point->parentItem()));
-            if(parent_line){
-                int row = c->getLineIndex(parent_line);
-                if(row != -1)
-                    return createIndex(row, 0, parent_line);
-            }
+    QModelIndex parent;
+    LineChart *c = dynamic_cast<LineChart*>(chart);
+    Point *point = dynamic_cast<Point*>(static_cast<ChartData*>(child.internalPointer()));
+    if(c && point){
+        Line * parent_line = (dynamic_cast<Line*>(point->parentItem()));
+        if(parent_line){
+            int row = c->getLineIndex(parent_line);
+            if(row != -1)
+                parent = createIndex(row, 0, parent_line);
         }
     }
-    return QModelIndex();
+    return parent;
 }
 
 QModelIndex LineModel::index(int row, int column, const QModelIndex &parent) const{

@@ -1,6 +1,7 @@
 #include "linechartwidget.h"
 #include <QSortFilterProxyModel>
 #include <QDoubleValidator>
+#include <QLocale>
 #include "Model/linemodel.h"
 
 void LineChartWidget::connectLineModelSignals() const{
@@ -104,10 +105,9 @@ void LineChartWidget::currentLine(int row){
         points->setCurrentIndex(-1);
         points->setModelColumn(2);
     }
-    else{
+    else
         current_line_index = QModelIndex();
-        points->setCurrentIndex(-1);
-    }
+    points->setCurrentIndex(-1);
 }
 
 void LineChartWidget::userInsertLine(){
@@ -121,6 +121,8 @@ void LineChartWidget::userRemoveLine(){
     if(row != -1){
         line_name->setText("");
         model->removeRows(row, 1);
+        point_x_value->setText("");
+        point_y_value->setText("");
     }
 }
 
@@ -130,7 +132,7 @@ void LineChartWidget::userChangeLineName(){
 }
 
 void LineChartWidget::currentPoint(int index){
-    if(current_line_index.isValid() && index != -1){
+    if(index != -1 && current_line_index.isValid()){
         point_x_value->setText(model->data(model->index(points->currentIndex(), 0, current_line_index)).toString());
         point_y_value->setText(model->data(model->index(points->currentIndex(), 1, current_line_index)).toString());
     }
@@ -154,11 +156,7 @@ void LineChartWidget::userInsertPoint(){
 
 void LineChartWidget::userRemovePoint(){
     if(current_line_index.isValid() && points->currentIndex() != -1)
-    model->removeRows(points->currentIndex(), 1, current_line_index);
-    if(!points->count()){
-        point_x_value->setText("");
-        point_y_value->setText("");
-    }
+        model->removeRows(points->currentIndex(), 1, current_line_index);
 }
 
 void LineChartWidget::userRemoveAllPoints(){
