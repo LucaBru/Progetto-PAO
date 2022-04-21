@@ -15,9 +15,10 @@ class ChartWidget : public CentralWidget{
     Q_OBJECT
 private:
     void connectSignalsAndSlot() const;
-    void configChartWidgetItems() const;
+    void configChartWidgetItems();
 protected:
     Model *model;
+    QGridLayout *main_layout;
     QGroupBox *chart_info;
     QGroupBox *serie_info;
     QComboBox *series;

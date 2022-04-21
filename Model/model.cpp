@@ -24,7 +24,7 @@ void Model::changeChartTitle(const QString &new_title){
 }
 
 bool Model::save(const QString &path) const{
-    QJsonObject *chart_obj = chart->parsing(); //rivedere
+    QJsonObject *chart_obj = chart->parsing();
 
     QFile file(path);
     if(file.open(QFile::WriteOnly)){
@@ -35,10 +35,6 @@ bool Model::save(const QString &path) const{
     return false;
 }
 
-/*
- * una volta fatto ciò perdere un po di tempo a riorganizzare graficamente l'intera struttura (altrimenti vado a rischio di non capirmi più fra un paio di ore !!)
- *
- */
 
 
 

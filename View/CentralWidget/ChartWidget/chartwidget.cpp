@@ -8,22 +8,22 @@ void ChartWidget::connectSignalsAndSlot() const{
     QObject::connect(save_chart_as, SIGNAL(clicked()), this, SLOT(saveChartAs()));
 }
 
-void ChartWidget::configChartWidgetItems() const{
+void ChartWidget::configChartWidgetItems(){
     chart_title->setText(model->getChartTitle());
-    QGridLayout *l = new QGridLayout(const_cast<ChartWidget*>(this));
-    l->addWidget(chart_info, 0, 0);
-    l->addWidget(serie_info, 1, 0);
-    l->addWidget(chart_view, 0, 1, 2, 1);
+    main_layout->addWidget(chart_info, 0, 0);
+    main_layout->addWidget(serie_info, 1, 0);
+    main_layout->addWidget(chart_view, 0, 1, 2, 1);
+    main_layout->setColumnStretch(0, 1);
+    main_layout->setColumnStretch(1, 2);
     chart_title->setPlaceholderText("chart's title");
     chart_info_layout->addRow("Title", chart_title);
-    chart_info_layout->addRow("Series", series);
     chart_info_layout->addRow(add_serie);
     chart_info_layout->addRow(remove_serie);
     chart_info_layout->addRow(save_chart);
     chart_info_layout->addRow(save_chart_as);
 }
 
-ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, parent), model(m), chart_info(new QGroupBox()), serie_info(new QGroupBox()), series(new QComboBox()), chart_title(new QLineEdit()), add_serie(new QPushButton()), remove_serie(new QPushButton()), save_chart(new QPushButton()), save_chart_as(new QPushButton()), chart(new QChart()), chart_view(new QChartView(chart)), chart_info_layout(new QFormLayout(chart_info)), serie_info_layout(new QFormLayout(serie_info)){
+ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, parent), model(m), chart_info(new QGroupBox()), serie_info(new QGroupBox()), series(new QComboBox()), chart_title(new QLineEdit()), add_serie(new QPushButton()), remove_serie(new QPushButton()), save_chart(new QPushButton()), save_chart_as(new QPushButton()), chart(new QChart()), chart_view(new QChartView(chart)), chart_info_layout(new QFormLayout(chart_info)), serie_info_layout(new QFormLayout(serie_info)), main_layout(new QGridLayout(this)){
     series->setModel(model);
     configChartWidgetItems();
     connectSignalsAndSlot();

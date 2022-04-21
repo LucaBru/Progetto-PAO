@@ -15,9 +15,11 @@ SOURCES += \
     Model/Chart/LineChart/linechart.cpp \
     Model/Chart/PieChart/piechart.cpp \
     Model/Chart/chart.cpp \
+    Model/barmodel.cpp \
     Model/linemodel.cpp \
     Model/model.cpp \
     Model/piemodel.cpp \
+    View/CentralWidget/ChartWidget/barchartwidget.cpp \
     View/CentralWidget/ChartWidget/chartwidget.cpp \
     View/CentralWidget/ChartWidget/linechartwidget.cpp \
     View/CentralWidget/ChartWidget/piechartwidget.cpp \
@@ -32,9 +34,11 @@ HEADERS += \
     Model/Chart/LineChart/linechart.h \
     Model/Chart/PieChart/piechart.h \
     Model/Chart/chart.h \
+    Model/barmodel.h \
     Model/linemodel.h \
     Model/model.h \
     Model/piemodel.h \
+    View/CentralWidget/ChartWidget/barchartwidget.h \
     View/CentralWidget/ChartWidget/chartwidget.h \
     View/CentralWidget/ChartWidget/linechartwidget.h \
     View/CentralWidget/ChartWidget/piechartwidget.h \

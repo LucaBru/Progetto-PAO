@@ -19,8 +19,3 @@ public:
 };
 
 #endif // MODEL_H
-
-/*
- * i vari model devono avvisare la vista degli aggiornamenti fatti
- *
- */

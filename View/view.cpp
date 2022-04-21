@@ -5,6 +5,8 @@
 #include "Model/piemodel.h"
 #include "View/CentralWidget/ChartWidget/linechartwidget.h"
 #include "Model/linemodel.h"
+#include "View/CentralWidget/ChartWidget/barchartwidget.h"
+#include "Model/barmodel.h"
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()){
    setCentralWidget(new StartMenu(this));
@@ -40,11 +42,11 @@ void View::createPieChart(){
 }
 
 void View::createLineChart(){
-    //come create PieChart
+    setCentralWidget(new LineChartWidget(this, new LineModel(this)));
 }
 
 void View::createBarChart(){
-    //come create PieChart
+    setCentralWidget(new BarChartWidget(this, new BarModel(this)));
 }
 
 

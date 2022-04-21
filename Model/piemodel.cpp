@@ -33,7 +33,7 @@ QVariant PieModel::data(const QModelIndex &index, int role) const{
     if(current && role == Qt::DisplayRole){
         if(index.column() == 0)
             return QVariant(current->getName());
-        if(index.column() ==1);
+        if(index.column() ==1)
             return QVariant(current->getValue());
     }
     return QVariant();

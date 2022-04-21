@@ -4,6 +4,8 @@
 #include <QJsonDocument>
 #include "View/CentralWidget/ChartWidget/piechartwidget.h"
 #include "View/CentralWidget/ChartWidget/linechartwidget.h"
+#include "View/CentralWidget/ChartWidget/barchartwidget.h"
+#include "Model/barmodel.h"
 #include "Model/linemodel.h"
 
 
@@ -39,7 +41,12 @@ void StartMenu::createFromFile(){
                 view->setCentralWidget(w);
                 w->setCurrentChartPath(path);
             }
-            else{}
+            else if(chart_type.compare("bar") == 0){
+                BarChartWidget *w = new BarChartWidget(view, new BarModel(view, obj));
+                w->createChartFromModel();
+                view->setCentralWidget(w);
+                w->setCurrentChartPath(path);
+            }
         }
     }
     //invocazione di checkchartType
