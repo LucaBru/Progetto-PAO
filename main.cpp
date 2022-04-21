@@ -11,7 +11,6 @@ int main(int argc, char *argv[]){
 
 /*
  *
- * problemi grafici con QScrollArea
  * Sistemare grafica anche di LineChartWidget e PieChartWidget
  *
  */

@@ -22,7 +22,7 @@ StartMenu::StartMenu(View *v, QWidget *parent) : CentralWidget(v, parent), creat
 }
 
 void StartMenu::createFromFile(){
-    QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "", tr("Chart Files (*.json)"));
+    QString path = QFileDialog::getOpenFileName(this, tr("Open Chart"), "C:\\Users\\lucab\\Desktop\\ChartProject\\Chart Samples", tr("Chart Files (*.json)"));
     QFile file(path);
 
     if(file.open(QFile::ReadOnly)){

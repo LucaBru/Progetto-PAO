@@ -16,6 +16,14 @@ QVariant BarModel::getSetValue(const QModelIndex &index) const{
     return result;
 }
 
+QVariant BarModel::getColor(const QModelIndex &index) const{
+    QVariant result;
+    Set *set = dynamic_cast<Set*>(static_cast<ChartData*>(index.internalPointer()));
+    if(set)
+        result = set->getColor();
+    return result;
+}
+
 bool BarModel::setSetName(const QModelIndex &index, const QString &new_name){
     bool result = static_cast<BarChart*>(chart)->changeSetNameAt(index.row(), new_name);
     if(result){
@@ -34,6 +42,16 @@ bool BarModel::setSetValue(const QModelIndex &index, double new_value){
             emit dataChanged(index, index);
             emit setAtChangedValue(index.row(), index.column(), new_value);
         }
+    }
+    return result;
+}
+
+bool BarModel::setSetColor(const QModelIndex &index, const QColor &color){
+    bool result = false;
+    Set *set = dynamic_cast<Set*>(static_cast<ChartData*>(index.internalPointer()));
+    if(set){
+        set->changeColor(color);
+        result = true;
     }
     return result;
 }
@@ -107,15 +125,21 @@ QVariant BarModel::data(const QModelIndex &index, int role) const{
             result = getSetValue(index);
         }
     }
+    else if(role == Qt::DecorationRole)
+        result = getColor(index);
     return result;
 }
 
 bool BarModel::setData(const QModelIndex &index, const QVariant &value, int role){
     bool result = false;
-    if(index.column() == 0)
-        result = setSetName(index, value.toString());
-    else
-        result = setSetValue(index, value.toDouble());
+    if(role == Qt::EditRole){
+        if(index.column() == 0)
+            result = setSetName(index, value.toString());
+        else
+            result = setSetValue(index, value.toDouble());
+    }
+    else if(role == Qt::DecorationRole && index.column() == 0)
+        result = setSetColor(index, value.value<QColor>());
     return result;
 }
 

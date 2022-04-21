@@ -3,6 +3,9 @@
 #include <QHBoxLayout>
 #include "Model/barmodel.h"
 #include <QInputDialog>
+#include <QColorDialog>
+#include <QColor>
+#include <QFrame>
 
 // ---------------------- CATEGORYWIDGET -----------------------------------------------
 
@@ -21,7 +24,6 @@ void CategoryWidget::confWidgetItems(){
     set_value->setPlaceholderText("0");
     garbage->setIcon(QIcon("C:\\Users\\lucab\\Desktop\\ChartProject\\icon\\garbage.png"));
     add_new_category->setIcon(QIcon("C:\\Users\\lucab\\Desktop\\ChartProject\\icon\\plus.png"));
-
     QHBoxLayout *l = new QHBoxLayout(this);
     l->addWidget(garbage);
     l->addWidget(category_name);
@@ -67,6 +69,7 @@ void BarChartWidget::connectSignalsAndSlots() const{
     QObject::connect(add_new_category, SIGNAL(clicked(bool)), this, SLOT(userInsertFirstCategory()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSetChanged(int)));
     QObject::connect(set_name, SIGNAL(editingFinished()), this, SLOT(userChangeSetName()));
+    QObject::connect(bar_serie, SIGNAL(clicked(int,QBarSet*)), this, SLOT(barClicked(int, QBarSet*)));
 }
 
 void BarChartWidget::connectBarModelSignals() const{
@@ -155,7 +158,9 @@ void BarChartWidget::removeSetsValueAtIndex(int index){
 
 void BarChartWidget::getSetsFromModel(){
     for(int i = 0; i < model->rowCount(); ++i){
-        QBarSet *set = new QBarSet(model->data(model->index(i, 0)).toString());
+        QModelIndex index = model->index(i, 0);
+        QBarSet *set = new QBarSet(model->data(index).toString());
+        set->setColor(model->data(index, Qt::DecorationRole).value<QColor>());
         for(int j = 0; j < model->columnCount()-1; ++j){
             double val = model->data(model->index(i, j+1)).toDouble();
             set->append(val);
@@ -190,6 +195,7 @@ BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : ChartWidget(v, m
 }
 
 void BarChartWidget::createChartFromModel(){
+    ChartWidget::createChartFromModel();
     getSetsFromModel();
     getCategoriesFromModel();
     series->setCurrentIndex(-1);
@@ -256,6 +262,7 @@ void BarChartWidget::multipleSetsInserted(int row, int count){
             list.push_back(0);
         for(int i = 0; i < count; ++i){
             QBarSet *s = new QBarSet("");
+            s->setColor(model->data(model->index(row+i, 0), Qt::DecorationRole).value<QColor>());
             s->append(list);
             bar_serie->insert(row+i, s);
         }
@@ -330,6 +337,17 @@ void BarChartWidget::updateYAxisRange(double val){
     double bound = val * 5 / 4;
     if(bound > value_axis->max())
         value_axis->setMax(bound);
+}
+
+void BarChartWidget::barClicked(int index, QBarSet *set){
+    QColor new_color = QColorDialog::getColor(set->color(), this, "Choose new set color");
+    if(new_color.isValid()){
+        QList<QBarSet*> bars_list = bar_serie->barSets();
+        int bar_index = 0;
+        for(QList<QBarSet*>::const_iterator i = bars_list.begin(); i != bars_list.end() && *i != set; ++i, ++bar_index){}
+        if(model->setData(model->index(bar_index, 0), new_color, Qt::DecorationRole));
+            set->setColor(new_color);
+    }
 }
 
 

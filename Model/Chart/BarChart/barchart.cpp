@@ -1,13 +1,14 @@
 #include "barchart.h"
+#include <cstdlib>
 #include <QJsonArray>
 
 // ------------------- SET ----------------------------------------------------
 
-Set::Set(int values_size) : name(""), values(values_size, 0){}
+Set::Set(int values_size) : name(""), color(rand()%256, rand()%256, rand()%256), values(values_size, 0){}
 
-Set::Set(const QString &n, vector<double> &arr) : name(n), values(arr){}
+Set::Set(const QString &n, vector<double> &arr) : name(n), values(arr){} //manca  color IMPORTANTE DA FARE
 
-Set::Set(const QJsonObject &obj) : name(obj.value("name").toString()){
+Set::Set(const QJsonObject &obj) : name(obj.value("name").toString()), color(obj.value("color").toString()){
     QJsonArray jvalues = obj.value("values").toArray();
     for(QJsonArray::const_iterator i = jvalues.begin(); i != jvalues.end(); ++i)
         values.push_back((i->toDouble() >= 0) ? i->toDouble() : 0);
@@ -24,6 +25,14 @@ bool Set::changeValueOfCategoryAt(int cat_index, double new_value){
         result = true;
     }
     return result;
+}
+
+void Set::changeColor(const QColor &new_color){
+    color = new_color;
+}
+
+QColor Set::getColor() const{
+    return color;
 }
 
 double Set::getValueOfCategoryAt(int cat_index){
@@ -58,6 +67,7 @@ QJsonObject Set::parsing() const{
     QJsonObject json_set;
     QJsonArray json_values;
     json_set.insert("name", name);
+    json_set.insert("color", color.name());
     for(vector<double>::const_iterator i = values.begin(); i != values.end(); ++i)
         json_values.push_back(*i);
     json_set.insert("values", json_values);

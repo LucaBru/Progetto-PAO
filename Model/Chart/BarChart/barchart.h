@@ -1,25 +1,29 @@
 #ifndef BARCHART_H
 #define BARCHART_H
 #include "Model/Chart/chart.h"
+#include <QColor>
 #include <vector>
 using std::vector;
 
 class Set : public ChartData{
 protected:
     QString name;
+    QColor color;
     vector<double> values; //invariante, tanti quanti le categorie
 public:
     Set(int values_size);
     Set(const QString& name, vector<double> &arr);
     Set(const QJsonObject& obj);
     QString getName() const;
-    bool changeValueOfCategoryAt(int cat_index, double new_value);
+    int getValuesSize() const;
     double getValueOfCategoryAt(int cat_index);
+    QColor getColor() const;
+    bool changeValueOfCategoryAt(int cat_index, double new_value);
 
+    void changeColor(const QColor& color);
     void changeName(const QString& new_name);
     void insertValue(int index, double value);
     bool removeValuesAt(int index, int count);
-    int getValuesSize() const;
     QJsonObject parsing() const;
 };
 

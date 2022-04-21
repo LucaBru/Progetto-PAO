@@ -10,8 +10,11 @@ class BarModel : public Model{
 private:
     QVariant getSetName(const QModelIndex& index) const;
     QVariant getSetValue(const QModelIndex& index) const;
+    QVariant getColor(const QModelIndex& index) const;
     bool setSetName(const QModelIndex& index, const QString& new_name);
     bool setSetValue(const QModelIndex& index, double new_value);
+    bool setSetColor(const QModelIndex& index, const QColor& color);
+
 public:
     BarModel(View *v, const QJsonObject& obj = QJsonObject(), QObject *parent =nullptr);
     int rowCount(const QModelIndex &parent) const override;
@@ -36,8 +39,6 @@ signals:
     void setAtChangedName(int index, const QString& new_name);
     void setAtChangedValue(int set_index, int value_index, double new_value);
     void categoryAtChangedName(int index, const QString& new_name);
-
-
 
 };
 

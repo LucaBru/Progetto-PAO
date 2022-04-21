@@ -8,6 +8,7 @@
 #include <QValueAxis>
 #include <QList>
 #include <vector>
+#include <QFrame>
 using std::vector;
 
 class BarChartWidget;
@@ -82,12 +83,11 @@ private slots:
     void categoryAtChangedName(int index, const QString& new_name);
     void currentSetChanged(int index);
     void updateYAxisRange(double val);
+    void barClicked(int index, QBarSet* set);
 };
 
 
 /*
- *
- * 1) completare BarChartWidget (far funzionanre la grafica)
  * 2) gestione profonda attributi BarChartWidget
  *
  *
