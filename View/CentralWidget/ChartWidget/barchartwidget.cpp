@@ -11,8 +11,8 @@
 
 void CategoryWidget::connectSignalsAndSlots() const{
     QObject::connect(garbage, SIGNAL(clicked(bool)), this, SLOT(userRemoveCategory()));
-    QObject::connect(category_name, SIGNAL(editingFinished()), this, SLOT(userChangeCategoryName()));
-    QObject::connect(set_value, SIGNAL(editingFinished()), this, SLOT(userChangeSetValue()));
+    QObject::connect(category_name, SIGNAL(returnPressed()), this, SLOT(userChangeCategoryName()));
+    QObject::connect(set_value, SIGNAL(returnPressed()), this, SLOT(userChangeSetValue()));
     QObject::connect(add_new_category, SIGNAL(clicked(bool)), this, SLOT(userAddCategory()));
 }
 
@@ -22,8 +22,8 @@ void CategoryWidget::confWidgetItems(){
     cat_val->setBottom(0);
     set_value->setValidator(cat_val);
     set_value->setPlaceholderText("0");
-    garbage->setIcon(QIcon("C:\\Users\\lucab\\Desktop\\ChartProject\\icon\\garbage.png"));
-    add_new_category->setIcon(QIcon("C:\\Users\\lucab\\Desktop\\ChartProject\\icon\\plus.png"));
+    garbage->setIcon(QIcon("..\\Chart-Application\\icon\\garbage.png"));
+    add_new_category->setIcon(QIcon("..\\Chart-Application\\icon\\plus.png"));
     QHBoxLayout *l = new QHBoxLayout(this);
     l->addWidget(garbage);
     l->addWidget(category_name);
@@ -42,6 +42,14 @@ void CategoryWidget::setValue(double val){
 
 void CategoryWidget::setCategoryName(const QString &name){
     category_name->setText(name);
+}
+
+void CategoryWidget::setBorderForTextError(){
+    category_name->setStyleSheet("border: 1px solid red");
+}
+
+void CategoryWidget::setDefaultBorder(){
+    category_name->setStyleSheet("");
 }
 
 void CategoryWidget::userRemoveCategory(){
@@ -69,7 +77,7 @@ void BarChartWidget::connectSignalsAndSlots() const{
     QObject::connect(add_new_category, SIGNAL(clicked(bool)), this, SLOT(userInsertFirstCategory()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSetChanged(int)));
     QObject::connect(set_name, SIGNAL(editingFinished()), this, SLOT(userChangeSetName()));
-    QObject::connect(bar_serie, SIGNAL(clicked(int,QBarSet*)), this, SLOT(barClicked(int, QBarSet*)));
+    QObject::connect(bar_serie, SIGNAL(clicked(int, QBarSet*)), this, SLOT(barClicked(int, QBarSet*)));
 }
 
 void BarChartWidget::connectBarModelSignals() const{
@@ -90,8 +98,6 @@ void BarChartWidget::configChartWidgetItems(){
     serie_info->setTitle("Set Info");
     add_serie->setText("Add Set");
     remove_serie->setText("Remove Set");
-    save_chart->setText("Save Bar Chart");
-    save_chart_as->setText("Save Bar Chart As");
     chart_info_layout->insertRow(1, "Sets", series);
     main_layout->setRowStretch(1, 1);
 }
@@ -113,6 +119,7 @@ void BarChartWidget::configBarChartWidgetItems(){
     area->setWidget(tmp);
     tmp->setLayout(cat_items_layout);
     area->setSizePolicy(p);
+    area->setFrameShape(QFrame::NoFrame);
 }
 
 void BarChartWidget::updateCategoryWidgetItems(int index, int count){
@@ -226,8 +233,10 @@ void BarChartWidget::addCategory(int index){
 
 void BarChartWidget::changeCategoryName(int index, const QString &new_name){
     bool result = static_cast<BarModel*>(model)->changeCategoryNameAt(index, new_name);
-    if(!result)
+    if(!result){
         QMessageBox::warning(this, "Change Category Name", "Something goes wrong, rember that the name must by unique");
+        static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget())->setBorderForTextError();
+    }
 }
 
 void BarChartWidget::changeSetValue(int index, double new_value){
@@ -297,7 +306,7 @@ void BarChartWidget::multipleCategoriesRemoved(int column, int count){
 }
 
 void BarChartWidget::categoryAtChangedName(int index, const QString &new_name){
-    static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget())->setCategoryName(new_name);
+    static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget())->setDefaultBorder();
     if(index >= 0 && index < categories_axis->count() && categories_axis->at(index) != new_name){
         QString old_name = categories_axis->at(index);
         categories_axis->replace(old_name, new_name);

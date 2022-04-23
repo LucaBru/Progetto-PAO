@@ -1,14 +1,21 @@
 #include "piechart.h"
+#include <QJsonArray>
 
 // ------------- Slice ------------------------
-Slice::Slice(const QString &n, double v) : name(n), value(v){}
+Slice::Slice(const QString &n, double v, const QColor c) : name(n), value(v), color(c){}
 
-const QString& Slice::getName() const{
+Slice::Slice(const QJsonObject &obj) : name(obj.value("name").toString()), value(obj.value("value").toDouble()), color(obj.value("color").toString()){}
+
+QString Slice::getName() const{
     return name;
 }
 
-const double& Slice::getValue() const{
+double Slice::getValue() const{
     return value;
+}
+
+QColor Slice::getColor() const{
+    return color;
 }
 
 void Slice::changeName(const QString &newName){
@@ -19,16 +26,18 @@ void Slice::changeValue(double newValue){
     value = newValue;
 }
 
+void Slice::changeColor(const QColor &new_color){
+    color = new_color;
+}
+
 // -------------- PieChart -------------------
 
 PieChart::PieChart(const QString &t) : Chart(t){}
 
 PieChart::PieChart(const QJsonObject& obj) : Chart(obj) {
-    QJsonObject list_of_slices = obj.value("slices").toObject();
-    if(!list_of_slices.isEmpty()){
-    for(QJsonObject::const_iterator i = list_of_slices.begin(); i != list_of_slices.end(); ++i)
-        slices.push_back(new Slice(i.key(), i.value().toDouble()));
-    }
+    QJsonArray list_of_slices = obj.value("slices").toArray();
+    for(QJsonArray::const_iterator i = list_of_slices.begin(); i != list_of_slices.end(); ++i)
+        slices.push_back(new Slice(i->toObject()));
 }
 
 vector<Slice*> PieChart::copySlices(const PieChart & from){
@@ -44,7 +53,7 @@ void PieChart::deleteSlices(PieChart & pieChart){
         delete *i;
 }
 
-bool PieChart::checkSliceName(const QString& name) const{
+bool PieChart::isSliceNameValid(const QString& name) const{
     bool valid = true;
     for(vector<Slice*>::const_iterator i = slices.begin(); valid && i != slices.end(); ++i)
         valid = (*i)->getName().compare(name);
@@ -94,12 +103,26 @@ int PieChart::slicesCount() const{
     return slices.size();
 }
 
+bool PieChart::changeSliceAtName(int index, const QString &new_name){
+    bool result = false;
+    if(index >= 0 && index < slices.size() && isSliceNameValid(new_name)){
+        slices[index]->changeName(new_name);
+        result = true;
+    }
+    return result;
+}
+
 QJsonObject* PieChart::parsing() const {
     QJsonObject *obj = Chart::parsing();
     obj->insert("type", "pie");
-    QJsonObject slices_in_chart;
-    for(vector<Slice*>::const_iterator i = slices.begin(); i != slices.end(); ++i)
-        slices_in_chart.insert((*i)->getName(), (*i)->getValue());
+    QJsonArray slices_in_chart;
+    for(vector<Slice*>::const_iterator i = slices.begin(); i != slices.end(); ++i){
+        QJsonObject slice;
+        slice.insert("name", (*i)->getName());
+        slice.insert("value", (*i)->getValue());
+        slice.insert("color", (*i)->getColor().name());
+        slices_in_chart.append(slice);
+    }
     obj->insert("slices", slices_in_chart);
     return obj;
 }

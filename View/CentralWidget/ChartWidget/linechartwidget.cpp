@@ -36,8 +36,6 @@ void LineChartWidget::configChartWidgetItems() const{
     serie_info->setTitle("Line");
     add_serie->setText("Add Line");
     remove_serie->setText("Remove Line");
-    save_chart->setText("Save Line Chart");
-    save_chart_as->setText("Save Line Chart as");
 }
 
 void LineChartWidget::configLineChartWidgetItems() const{

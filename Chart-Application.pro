@@ -24,8 +24,6 @@ SOURCES += \
     View/CentralWidget/ChartWidget/linechartwidget.cpp \
     View/CentralWidget/ChartWidget/piechartwidget.cpp \
     View/CentralWidget/centralwidget.cpp \
-    View/CentralWidget/chartfromusermenu.cpp \
-    View/CentralWidget/startmenu.cpp \
     View/view.cpp \
     main.cpp
 
@@ -43,8 +41,6 @@ HEADERS += \
     View/CentralWidget/ChartWidget/linechartwidget.h \
     View/CentralWidget/ChartWidget/piechartwidget.h \
     View/CentralWidget/centralwidget.h \
-    View/CentralWidget/chartfromusermenu.h \
-    View/CentralWidget/startmenu.h \
     View/view.h
 
 FORMS +=

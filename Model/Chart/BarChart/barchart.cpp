@@ -6,7 +6,7 @@
 
 Set::Set(int values_size) : name(""), color(rand()%256, rand()%256, rand()%256), values(values_size, 0){}
 
-Set::Set(const QString &n, vector<double> &arr) : name(n), values(arr){} //manca  color IMPORTANTE DA FARE
+Set::Set(const QString &n, vector<double> &arr) : name(n),  color(rand()%256, rand()%256, rand()%256), values(arr){}
 
 Set::Set(const QJsonObject &obj) : name(obj.value("name").toString()), color(obj.value("color").toString()){
     QJsonArray jvalues = obj.value("values").toArray();

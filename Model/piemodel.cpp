@@ -1,18 +1,46 @@
 #include "piemodel.h"
 
+bool PieModel::changeSliceName(int index, const QString &new_name){
+    bool result = static_cast<PieChart*>(chart)->changeSliceAtName(index, new_name);
+    if(result)
+        emit sliceAtNameChanged(index, new_name);
+    return result;
+}
+
+bool PieModel::changeSliceValue(int index, double new_value){
+    bool result = false;
+    Slice *slice = static_cast<PieChart*>(chart)->getSlice(index);
+    if(slice){
+        slice->changeValue(new_value);
+        emit sliceAtValueChanged(index, new_value);
+        result = true;
+    }
+    return result;
+}
+
+bool PieModel::changeSliceColor(int index, const QColor &new_color){
+    bool result = false;
+    Slice *slice = static_cast<PieChart*>(chart)->getSlice(index);
+    if(slice){
+        slice->changeColor(new_color);
+        result = true;
+    }
+    return result;
+}
+
 PieModel::PieModel(View *v, const QJsonObject& obj, QObject *parent) : Model(v, ((obj.isEmpty()) ? new PieChart() : new PieChart(obj)), parent){}
 
 int PieModel::rowCount(const QModelIndex &parent) const{
-    return (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->slicesCount() : 0;
+    return static_cast<PieChart*>(chart)->slicesCount();
 }
 
 int PieModel::columnCount(const QModelIndex &parent) const{
-    return (!parent.isValid()) ? 2 : 0;
+    return (!parent.isValid()) ? 3 : 0;
 }
 
 bool PieModel::insertRows(int row, int count, const QModelIndex &parent){
     beginInsertRows(parent, row, row+count-1);
-    bool result = (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->insertSlices(row, count) : false;
+    bool result = static_cast<PieChart*>(chart)->insertSlices(row, count);
     endInsertRows();
     if(result)
         emit addMultipleSlices(row, count);
@@ -21,7 +49,7 @@ bool PieModel::insertRows(int row, int count, const QModelIndex &parent){
 
 bool PieModel::removeRows(int row, int count, const QModelIndex &parent){
     beginRemoveRows(parent, row, row+count-1);
-    bool result = (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->removeSlices(row, count) : false;
+    bool result = static_cast<PieChart*>(chart)->removeSlices(row, count);
     endRemoveRows();
     if(result)
         emit removeMultipleSlices(row, count);
@@ -29,49 +57,47 @@ bool PieModel::removeRows(int row, int count, const QModelIndex &parent){
 }
 
 QVariant PieModel::data(const QModelIndex &index, int role) const{
-    const Slice *current = (!index.parent().isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->getSlice(index.row()) : nullptr;
+    QVariant result;
+    const Slice *current = static_cast<PieChart*>(chart)->getSlice(index.row());
+    int column = index.column();
     if(current && role == Qt::DisplayRole){
-        if(index.column() == 0)
-            return QVariant(current->getName());
-        if(index.column() ==1)
-            return QVariant(current->getValue());
+        if(column == 0)
+            result = current->getName();
+        else if(column == 1)
+            result = current->getValue();
     }
-    return QVariant();
+    else if(current && role == Qt::DecorationRole && column == 0)
+        result = current->getColor();
+    return result;
 }
 
 bool PieModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    PieChart * piechart = dynamic_cast<PieChart*>(chart);
-    Slice *current = (!index.parent().isValid() && piechart) ? piechart->getSlice(index.row()) : nullptr;
-     if(current && piechart){
-         if(index.column() == 0 && piechart->checkSliceName(value.toString())){
-             current->changeName(value.toString());
-             emit dataChanged(index, index);
-             emit sliceAtNameChanged(index.row(), value.toString());
-             return true;
-         }
-         if(index.column() == 1 ){
-             current->changeValue(value.toDouble());
-             emit dataChanged(index, index);
-             emit sliceAtValueChanged(index.row(), value.toDouble());
-             return true;
-         }
+    bool result = false;
+    int column = index.column();
+    int row = index.row();
+    if(role == Qt::EditRole){
+        if(column == 0)
+            result = changeSliceName(row, value.toString());
+        else if(column == 1)
+            result = changeSliceValue(row, value.toDouble());
+
+        if(result)
+            emit dataChanged(index, index);
      }
-     return false;
+     else if(role == Qt::DecorationRole && column == 0)
+         result = changeSliceColor(index.row(), value.value<QColor>());
+     return result;
 }
 
 QModelIndex PieModel::parent(const QModelIndex &index) const{
-    return QModelIndex(); //in questo caso non serve chiamare index.internalPointer->parentItem() in quanto in un pie chart i dati
-    //non sono disposti in una gerarchia ad albero
+    return QModelIndex();
 }
 
 QModelIndex PieModel::index(int row, int column, const QModelIndex &parent) const{
-   const Slice *current = (!parent.isValid() && dynamic_cast<PieChart*>(chart)) ? static_cast<PieChart*>(chart)->getSlice(row) : nullptr;
-   if(current){
-       if(column == 0)
-           return createIndex(row, column, const_cast<QString*>(&(current->getName())));
-       if(column == 1)
-           return createIndex(row, column, const_cast<double*>(&(current->getValue())));
-   }
-   return QModelIndex();
+   Slice *slice = static_cast<PieChart*>(chart)->getSlice(row);
+   QModelIndex index;
+   if(slice)
+        index = createIndex(row, column, slice);
+   return index;
 }
 

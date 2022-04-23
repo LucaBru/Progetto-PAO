@@ -30,6 +30,8 @@ public:
     CategoryWidget(BarChartWidget *parent, int index);
     void setValue(double val);
     void setCategoryName(const QString& name);
+    void setBorderForTextError();
+    void setDefaultBorder();
 private slots:
     void userRemoveCategory();
     void userAddCategory();

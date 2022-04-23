@@ -8,9 +8,3 @@ int main(int argc, char *argv[]){
     view->show();
     return a.exec();
 }
-
-/*
- *
- * Sistemare grafica anche di LineChartWidget e PieChartWidget
- *
- */

@@ -1,6 +1,8 @@
 #ifndef PIECHART_H
 #define PIECHART_H
+#include <QColor>
 #include "Model/Chart/chart.h"
+#include <cstdlib>
 #include <vector>
 using std::vector;
 
@@ -8,12 +10,16 @@ class Slice : public ChartData{
 private:
     QString name;
     double value;
+    QColor color;
 public:
-    Slice(const QString& n = QString(), double v = 0);
-    const QString& getName() const;
-    const double& getValue() const;
+    Slice(const QString& n = QString(), double v = 0,  const QColor color = (rand()%256, rand()%256, rand()%256));
+    Slice(const QJsonObject& obj);
+    QString getName() const;
+    double getValue() const;
+    QColor getColor() const;
     void changeName(const QString& newName);
     void changeValue(double newValue);
+    void changeColor(const QColor& new_color);
 };
 
 class PieChart : public Chart{
@@ -22,6 +28,7 @@ private:
 
     static vector<Slice*> copySlices(const PieChart& from);
     static void deleteSlices(PieChart& pieChart);
+    bool isSliceNameValid(const QString& name) const;
 public:
     PieChart(const QString& t = QString());
     PieChart(const QJsonObject& obj);
@@ -34,8 +41,9 @@ public:
     bool removeSlices(int row, int count);
     Slice* getSlice(int index) const; //può tornare un nullptr
     int slicesCount() const;
-    bool checkSliceName(const QString& name) const;
-    QJsonObject* parsing() const override;
+
+    bool changeSliceAtName(int index, const QString& new_name);
+    QJsonObject* parsing() const override; //da modificare per mantenere l'ordine
 };
 
 #endif // PIECHART_H

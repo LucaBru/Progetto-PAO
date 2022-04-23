@@ -2,11 +2,15 @@
 #define VIEW_H
 #include <QObject>
 #include <QMainWindow>
+#include <QToolBar>
 
 class View : public QObject{
     Q_OBJECT
+private:
+    void manageOldChart() const;
 protected:
     QMainWindow *mainW;
+    QToolBar *tool_bar;
 public:
     View(QObject *parent =nullptr);
     ~View();
@@ -14,17 +18,14 @@ public:
     void setCentralWidget(QWidget* widget);
     void show() const;
     QMainWindow* getMainWindow() const;
+    QAction* addActionToToolBar(const QIcon& icon, const QString& text);
+    void removeAction(QAction* action);
 
-public slots:
-    void createFromUserInput();
-    void createPieChart();
-    void createLineChart();
-    void createBarChart();
+private slots:
+    void openFromFile();
+    void newPieChart();
+    void newLineChart();
+    void newBarChart();
 };
 
-/*
- * eliminare vari commenti superflui e aggiornare gerarchia di classi in
- * https://app.creately.com/d/h9nH6ZYJoPx/edit
- *
- */
 #endif // VIEW_H

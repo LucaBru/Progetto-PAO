@@ -6,6 +6,11 @@
 
 class PieModel : public Model{
     Q_OBJECT
+private:
+    bool changeSliceName(int index, const QString& new_name);
+    bool changeSliceValue(int index, double new_value);
+    bool changeSliceColor(int index, const QColor& new_color);
+
 public:
     PieModel(View *v, const QJsonObject& obj = QJsonObject(), QObject * parent =nullptr);
     int rowCount(const QModelIndex& parent) const override;
@@ -18,6 +23,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     QModelIndex parent(const QModelIndex &index) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+
 signals:
     void addMultipleSlices(int row, int count);
     void removeMultipleSlices(int row, int count);

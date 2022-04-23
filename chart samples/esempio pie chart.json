@@ -1,0 +1,31 @@
+{
+    "slices": [
+        {
+            "color": "#d4d41e",
+            "name": "Bitcon BTC",
+            "value": 10
+        },
+        {
+            "color": "#57df32",
+            "name": "Ethereum ETH",
+            "value": 7
+        },
+        {
+            "color": "#da2fbe",
+            "name": "Binance",
+            "value": 2
+        },
+        {
+            "color": "#0000a0",
+            "name": "Cardano CA",
+            "value": 3
+        },
+        {
+            "color": "#ac191b",
+            "name": "ShibaInu",
+            "value": 1.5
+        }
+    ],
+    "title": "Cryptovalute",
+    "type": "pie"
+}

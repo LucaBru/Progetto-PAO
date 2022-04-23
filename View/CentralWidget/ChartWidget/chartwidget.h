@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QRadioButton>
+#include <QAction>
 
 class ChartWidget : public CentralWidget{
     Q_OBJECT
@@ -25,8 +26,8 @@ protected:
     QLineEdit *chart_title;
     QPushButton *add_serie;
     QPushButton *remove_serie;
-    QPushButton *save_chart;
-    QPushButton *save_chart_as;
+    QAction *save;
+    QAction *save_as;
     QFormLayout *chart_info_layout;
     QFormLayout *serie_info_layout;
     QChart *chart;
@@ -35,11 +36,12 @@ protected:
 
 public:
     ChartWidget(View *v, Model * m, QWidget *parent =nullptr);
-    void setCurrentChartPath(const QString& path);
     virtual void createChartFromModel();
+    void updateFilePath(const QString& path);
     ~ChartWidget();
 private slots:
     void changeTitle();
+public slots:
     void saveChart();
     void saveChartAs();
 };
