@@ -1,0 +1,38 @@
+{
+    "lines": [
+        {
+            "color": "#73c228",
+            "name": "linea 1",
+            "x values": [
+                0,
+                1,
+                2,
+                4
+            ],
+            "y values": [
+                0,
+                3,
+                1.5,
+                5
+            ]
+        },
+        {
+            "color": "#2334c6",
+            "name": "linea 2",
+            "x values": [
+                0,
+                2,
+                3,
+                4
+            ],
+            "y values": [
+                1,
+                4,
+                1,
+                7
+            ]
+        }
+    ],
+    "title": "chart correctness",
+    "type": "line"
+}

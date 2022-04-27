@@ -1,0 +1,48 @@
+{
+    "lines": [
+        {
+            "color": "#90afa7",
+            "name": "Linea 1",
+            "x values": [
+            ],
+            "y values": [
+            ]
+        },
+        {
+            "color": "#f40f2c",
+            "name": "Linea 2",
+            "x values": [
+            ],
+            "y values": [
+            ]
+        },
+        {
+            "color": "#29d8ac",
+            "name": "",
+            "x values": [
+            ],
+            "y values": [
+            ]
+        },
+        {
+            "color": "#693488",
+            "name": "Linea 3",
+            "x values": [
+                2
+            ],
+            "y values": [
+                21
+            ]
+        },
+        {
+            "color": "#63a1c9",
+            "name": "",
+            "x values": [
+            ],
+            "y values": [
+            ]
+        }
+    ],
+    "title": "line chart correctness",
+    "type": "line"
+}

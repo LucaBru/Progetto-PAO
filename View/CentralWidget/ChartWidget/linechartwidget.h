@@ -15,6 +15,7 @@ private:
     void configInitialQLineSeries();
     void configInitialQPointFsInQLineSeries(const QModelIndex& line_index);
     void updateChartAxes();
+
 protected:
     QLineEdit *line_name;
     QList<QLineSeries*> lines;
@@ -46,6 +47,7 @@ protected slots:
     void multiplePointsAtLineInserted(int line_row, int point_row, int count);
     void multiplePointsAtLineRemoved(int line_row, int point_row, int count);
     void pointAtLineChanged(int line_row, int row, double new_x, double new_y);
+    void changeLineColor();
 };
 
 

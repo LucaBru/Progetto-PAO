@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QRadioButton>
+#include <QToolButton>
 #include <QAction>
 
 class ChartWidget : public CentralWidget{
@@ -26,6 +27,7 @@ protected:
     QLineEdit *chart_title;
     QPushButton *add_serie;
     QPushButton *remove_serie;
+    QToolButton *color;
     QAction *save;
     QAction *save_as;
     QFormLayout *chart_info_layout;

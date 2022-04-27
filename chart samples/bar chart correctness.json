@@ -1,0 +1,29 @@
+{
+    "cat": [
+        "1",
+        "2",
+        "3"
+    ],
+    "sets": [
+        {
+            "color": "#4544f3",
+            "name": "set 1",
+            "values": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "color": "#000000",
+            "name": "set 2",
+            "values": [
+                1,
+                0,
+                0
+            ]
+        }
+    ],
+    "title": "bar chart correctness",
+    "type": "bar"
+}

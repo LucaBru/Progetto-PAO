@@ -8,3 +8,8 @@ int main(int argc, char *argv[]){
     view->show();
     return a.exec();
 }
+
+/*
+ * manca qualche piccolezza, rivedere bordo di QLineEdit per il resto ok
+ *
+ */

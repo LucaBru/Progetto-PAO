@@ -61,7 +61,8 @@ private:
     void removeSetsValueAtIndex(int index);
     void getSetsFromModel();
     void getCategoriesFromModel();
-protected:
+    void changeSetColor(int set_index);
+    void resetCategoryBorderStyle();
 
 public:
     BarChartWidget(View *v, Model *m, QWidget *parent =nullptr);
@@ -86,6 +87,7 @@ private slots:
     void currentSetChanged(int index);
     void updateYAxisRange(double val);
     void barClicked(int index, QBarSet* set);
+    void changeColor();
 };
 
 

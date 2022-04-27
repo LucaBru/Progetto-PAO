@@ -76,8 +76,9 @@ void BarChartWidget::connectSignalsAndSlots() const{
     QObject::connect(remove_serie, SIGNAL(clicked(bool)), this, SLOT(userRemoveSet()));
     QObject::connect(add_new_category, SIGNAL(clicked(bool)), this, SLOT(userInsertFirstCategory()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSetChanged(int)));
-    QObject::connect(set_name, SIGNAL(editingFinished()), this, SLOT(userChangeSetName()));
+    QObject::connect(set_name, SIGNAL(returnPressed()), this, SLOT(userChangeSetName()));
     QObject::connect(bar_serie, SIGNAL(clicked(int, QBarSet*)), this, SLOT(barClicked(int, QBarSet*)));
+    QObject::connect(color, SIGNAL(clicked(bool)), this, SLOT(changeColor()));
 }
 
 void BarChartWidget::connectBarModelSignals() const{
@@ -103,8 +104,11 @@ void BarChartWidget::configChartWidgetItems(){
 }
 
 void BarChartWidget::configBarChartWidgetItems(){
+    QHBoxLayout *set_name_layout = new QHBoxLayout();
+    set_name_layout->addWidget(set_name);
+    set_name_layout->addWidget(color);
     set_name->setPlaceholderText("set name");
-    serie_info_layout->addRow(set_name);
+    serie_info_layout->addRow(set_name_layout);
     if(cat_items_layout->rowCount() == 0)
         serie_info_layout->addRow(add_new_category);
 
@@ -187,6 +191,19 @@ void BarChartWidget::getCategoriesFromModel(){
     }
 }
 
+void BarChartWidget::changeSetColor(int set_index){
+    QBarSet *set = bar_serie->barSets()[set_index];
+    QColor new_color = QColorDialog::getColor(set->color(), this, "Choose new set color");
+    if(new_color.isValid())
+        if(model->setData(model->index(set_index, 0), new_color, Qt::DecorationRole));
+            set->setColor(new_color);
+}
+
+void BarChartWidget::resetCategoryBorderStyle(){
+    for(int i = 0; i < categories_axis->count(); ++i)
+        static_cast<CategoryWidget*>(cat_items_layout->itemAt(i, QFormLayout::SpanningRole)->widget())->setDefaultBorder();
+}
+
 BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : ChartWidget(v, m, p),  bar_serie(new QBarSeries()), add_new_category(new QPushButton("Add New Category")), cat_items_layout(new QFormLayout()), value_axis(new QValueAxis()), categories_axis(new QBarCategoryAxis()), set_name(new QLineEdit()){
     chart->addSeries(bar_serie);
     configChartWidgetItems();
@@ -226,17 +243,21 @@ void BarChartWidget::addCategory(int index){
         if(static_cast<BarModel*>(model)->isCategoryNameValid(cat_name)){
             model->insertColumns(index+1, 1);
             categories_axis->insert(index, cat_name);
-            valid = static_cast<BarModel*>(model)->changeCategoryNameAt(index, cat_name);
+            static_cast<BarModel*>(model)->changeCategoryNameAt(index, cat_name);
+            valid = true;
         }
     }
 }
 
 void BarChartWidget::changeCategoryName(int index, const QString &new_name){
     bool result = static_cast<BarModel*>(model)->changeCategoryNameAt(index, new_name);
+    CategoryWidget* cat = static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget());
     if(!result){
         QMessageBox::warning(this, "Change Category Name", "Something goes wrong, rember that the name must by unique");
-        static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget())->setBorderForTextError();
+        cat->setBorderForTextError();
     }
+    else
+        cat->setDefaultBorder();
 }
 
 void BarChartWidget::changeSetValue(int index, double new_value){
@@ -261,7 +282,10 @@ void BarChartWidget::userInsertFirstCategory(){
 }
 
 void BarChartWidget::userChangeSetName(){
-    model->setData(model->index(series->currentIndex(), 0), set_name->text());
+    if(!model->setData(model->index(series->currentIndex(), 0), set_name->text())){
+        QMessageBox::warning(this, "Change Set Name", "Something goes wrong, rember that the name must by unique");
+        set_name->setStyleSheet("border: 1px solid red");
+    }
 }
 
 void BarChartWidget::multipleSetsInserted(int row, int count){
@@ -306,7 +330,9 @@ void BarChartWidget::multipleCategoriesRemoved(int column, int count){
 }
 
 void BarChartWidget::categoryAtChangedName(int index, const QString &new_name){
-    static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget())->setDefaultBorder();
+    CategoryWidget *item = static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget());
+    item->setDefaultBorder();
+    item->setCategoryName(new_name);
     if(index >= 0 && index < categories_axis->count() && categories_axis->at(index) != new_name){
         QString old_name = categories_axis->at(index);
         categories_axis->replace(old_name, new_name);
@@ -323,6 +349,7 @@ void BarChartWidget::multipleSetsRemoved(int row, int count){
 
 void BarChartWidget::setAtChangedName(int index, const QString &new_name){
     if(index >= 0 && index < bar_serie->barSets().size())
+        set_name->setStyleSheet("");
         bar_serie->barSets()[index]->setLabel(new_name);
 }
 
@@ -339,7 +366,9 @@ void BarChartWidget::setAtChangedValue(int set_index, int value_index, double ne
 
 void BarChartWidget::currentSetChanged(int index){
     set_name->setText(model->data(model->index(index, 0)).toString());
+    set_name->setStyleSheet("");
     updateSetValueOnSeriesCurrentIndexChanged(index);
+    resetCategoryBorderStyle();
 }
 
 void BarChartWidget::updateYAxisRange(double val){
@@ -349,14 +378,17 @@ void BarChartWidget::updateYAxisRange(double val){
 }
 
 void BarChartWidget::barClicked(int index, QBarSet *set){
-    QColor new_color = QColorDialog::getColor(set->color(), this, "Choose new set color");
-    if(new_color.isValid()){
-        QList<QBarSet*> bars_list = bar_serie->barSets();
-        int bar_index = 0;
-        for(QList<QBarSet*>::const_iterator i = bars_list.begin(); i != bars_list.end() && *i != set; ++i, ++bar_index){}
-        if(model->setData(model->index(bar_index, 0), new_color, Qt::DecorationRole));
-            set->setColor(new_color);
-    }
+    int set_index = 0;
+    QList<QBarSet*> bars_list = bar_serie->barSets();
+    for(QList<QBarSet*>::const_iterator i = bars_list.begin(); i != bars_list.end() && *i != set; ++i, ++set_index){}
+    changeSetColor(set_index);
 }
+
+void BarChartWidget::changeColor(){
+    int index = series->currentIndex();
+    if(index != -1)
+        changeSetColor(index);
+}
+
 
 

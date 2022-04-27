@@ -7,7 +7,7 @@
     ],
     "sets": [
         {
-            "color": "#22ca22",
+            "color": "#74ca81",
             "name": "Campania",
             "values": [
                 5827,
@@ -17,7 +17,7 @@
             ]
         },
         {
-            "color": "#0011ff",
+            "color": "#5a8cff",
             "name": "Piemonte",
             "values": [
                 4376,
@@ -27,7 +27,7 @@
             ]
         },
         {
-            "color": "#ca0003",
+            "color": "#ca874d",
             "name": "Sicilia",
             "values": [
                 5027,
@@ -37,7 +37,7 @@
             ]
         },
         {
-            "color": "#cbcb3f",
+            "color": "#b883af",
             "name": "Veneto",
             "values": [
                 4905,

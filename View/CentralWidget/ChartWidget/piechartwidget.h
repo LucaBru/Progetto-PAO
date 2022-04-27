@@ -10,8 +10,8 @@ private:
     void connectPieModelSignalsToSlots() const;
     void configChartWidgetItems() const;
     void configPieChartWidgetItems() const;
-
     void getSlicesFromModel();
+    void changeSliceColor(int slice_index);
 
 protected:
     QPieSeries *slices;
@@ -33,6 +33,7 @@ protected slots:
     void sliceChangedName(int index, const QString& name);
     void sliceChangedValue(int index, double value);
     void sliceClicked(QPieSlice* slice);
+    void changeColor();
 };
 
 #endif // PIECHARTWIDGET_H

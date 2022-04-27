@@ -11,12 +11,12 @@ ChartData* Point::parentItem() const{
     return parent;
 }
 
-const double* Point::getX() const{
-    return (valid) ? &x : nullptr;
+double Point::getX() const{
+    return x;
 }
 
-const double* Point::getY() const{
-    return (valid) ? &y : nullptr;
+double Point::getY() const{
+    return y;
 }
 
 bool Point::isValid() const{
@@ -103,11 +103,12 @@ void Line::confPointsFromQJsonObject(const QJsonObject &line){
     }
 }
 
-Line::Line(const QString &n) : name(n){}
+Line::Line(const QString &n, const QColor& c) : name(n), color(c){}
 
 Line::Line(const QJsonObject& line){
     if(!line.isEmpty()){
-        name = line.value("line name").toString();
+        name = line.value("name").toString();
+        color = line.value("color").toString();
         confPointsFromQJsonObject(line);
     }
 }
@@ -138,11 +139,19 @@ Point* Line::getPoint(int index) const{
     return (index >= 0 && index < points.size()) ? points[index] : nullptr;
 }
 
+QColor Line::getColor() const{
+    return color;
+}
+
+void Line::changeColor(const QColor &new_color){
+    color = new_color;
+}
+
 bool Line::isPointNewXValueCorrect(int point_index, double new_x_value) const{
     Point *before = findFirstValidPointBefore(point_index);
-    bool b = (before) ? *before->getX() < new_x_value : true;
+    bool b = (before) ? before->getX() < new_x_value : true;
     Point *after = findFirstValidPointAfter(point_index);
-    bool a = (after) ? *after->getX() > new_x_value : true;
+    bool a = (after) ? after->getX() > new_x_value : true;
     return b && a;
 }
 
@@ -176,11 +185,25 @@ int Line::getPointsCount() const{
     return points.size();
 }
 
+QJsonArray Line::getXValuesAsJsonArray() const{
+    QJsonArray x_points;
+    for(vector<Point*>::const_iterator i = points.begin(); i != points.end(); ++i)
+        x_points.append((*i)->getX());
+    return x_points;
+}
+
+QJsonArray Line::getYValuesAsJsonArray() const{
+    QJsonArray y_points;
+    for(vector<Point*>::const_iterator i = points.begin(); i != points.end(); ++i)
+        y_points.append((*i)->getY());
+    return y_points;
+}
+
 // --------------------- LineChart -----------------------
 
 void LineChart::confLinesFromQJsonObject(const QJsonArray& lines_from_json){
     for(QJsonArray::const_iterator i = lines_from_json.constBegin(); i != lines_from_json.constEnd(); ++i){
-        if(!existLineName(i->toObject().value("line name").toString()))
+        if(!existLineName(i->toObject().value("name").toString()))
             lines.push_back(new Line(i->toObject()));
     }
 
@@ -191,6 +214,19 @@ bool LineChart::existLineName(const QString &line_name) const{
     for(vector<Line*>::const_iterator i = lines.begin(); i != lines.end() && !exist; ++i)
         exist = (*i)->getName().compare(line_name, Qt::CaseInsensitive) == 0;
     return exist;
+}
+
+QJsonArray LineChart::getLinesAsJsonArray() const{
+    QJsonArray lines_in_chart;
+    for(vector<Line*>::const_iterator i = lines.begin(); i != lines.end(); ++i){
+        QJsonObject line;
+        line.insert("name", (*i)->getName());
+        line.insert("color", (*i)->getColor().name());
+        line.insert("x values", (*i)->getXValuesAsJsonArray());
+        line.insert("y values", (*i)->getYValuesAsJsonArray());
+        lines_in_chart.append(line);
+    }
+    return lines_in_chart;
 }
 
 vector<Line*> LineChart::copyLines(const LineChart& chart){
@@ -267,26 +303,8 @@ bool LineChart::removeLines(int index, int count){
 
 QJsonObject* LineChart::parsing() const{
     QJsonObject* obj = Chart::parsing();
-    QJsonArray lines_in_chart;
-    for(vector<Line*>::const_iterator i = lines.begin(); i != lines.end(); ++i){
-        QJsonObject current_line;
-        current_line.insert("line name", (*i)->getName());
-        int points_in_line = (*i)->getPointsCount();
-        QJsonArray x_values;
-        QJsonArray y_values;
-        for(int j=0; j < points_in_line; ++j){
-            Point *current_point = (*i)->getPoint(j);
-            if(current_point->isValid()){
-                x_values.push_back(*current_point->getX());
-                y_values.push_back(*current_point->getY());
-            }
-        }
-        current_line.insert("x values", x_values);
-        current_line.insert("y values", y_values);
-        lines_in_chart.push_back(current_line);
-    }
     obj->insert("type", "line");
-    obj->insert("lines", lines_in_chart);
+    obj->insert("lines", getLinesAsJsonArray());
     return obj;
 }
 

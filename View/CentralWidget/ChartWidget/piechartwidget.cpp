@@ -18,6 +18,8 @@ void PieChartWidget::connectSignalsToSlots() const{
     QObject::connect(slice_name, SIGNAL(returnPressed()), this, SLOT(userChangeSliceName()));
     QObject::connect(slice_value, SIGNAL(returnPressed()), this, SLOT(userChangeSliceValue()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSlice(int)));
+    QObject::connect(color, SIGNAL(clicked(bool)), this, SLOT(changeColor()));
+
 }
 
 void PieChartWidget::configChartWidgetItems() const{
@@ -30,10 +32,13 @@ void PieChartWidget::configChartWidgetItems() const{
 }
 
 void PieChartWidget::configPieChartWidgetItems() const{
-    serie_info_layout->addRow("slice name", slice_name);
+    QHBoxLayout *slice_name_layout = new QHBoxLayout();
+    slice_name_layout->addWidget(slice_name);
+    slice_name_layout->addWidget(color);
+    serie_info_layout->addRow("slice name", slice_name_layout);
     serie_info_layout->addRow("slice value", slice_value);
     slice_name->setPlaceholderText("none");
-    slice_value->setValidator(new QDoubleValidator(this));
+    slice_value->setValidator(new QDoubleValidator(const_cast<PieChartWidget*>(this)));
 }
 
 PieChartWidget::PieChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), slice_name(new QLineEdit()), slice_value(new QLineEdit()), slices(new QPieSeries()){
@@ -51,6 +56,14 @@ void PieChartWidget::getSlicesFromModel(){
         new_slice->setColor(model->data(index, Qt::DecorationRole).value<QColor>());
         slices->append(new_slice);
     }
+}
+
+void PieChartWidget::changeSliceColor(int slice_index){
+    QPieSlice *slice = slices->slices()[slice_index];
+    QColor new_color = QColorDialog::getColor(slice->color(), this, "Choose new slice color");
+    if(new_color.isValid())
+        if(model->setData(model->index(slice_index, 0), new_color, Qt::DecorationRole))
+            slice->setColor(new_color);
 }
 
 void PieChartWidget::createChartFromModel(){
@@ -94,7 +107,7 @@ void PieChartWidget::multipleSlicesInserted(int first, int count){
     for(int i=0; i < count; ++i){
         QPieSlice *new_slice = new QPieSlice("", 0);
         new_slice->setColor(model->data(model->index(first+i, 0), Qt::DecorationRole).value<QColor>());
-        slices->insert(first+i, new QPieSlice("", 0));
+        slices->insert(first+i, new_slice);
     }
 }
 
@@ -116,14 +129,16 @@ void PieChartWidget::sliceChangedValue(int index, double value){
 }
 
 void PieChartWidget::sliceClicked(QPieSlice *slice){
-    QColor new_color = QColorDialog::getColor(slice->color(), this, "Choose new slice color");
-    if(new_color.isValid()){
-        QList<QPieSlice*> slices_list = slices->slices();
-        int slice_index = 0;
-        for(QList<QPieSlice*>::const_iterator i = slices_list.begin(); i != slices_list.end() && *i != slice; ++i, ++slice_index);
-        if(model->setData(model->index(slice_index, 0), new_color, Qt::DecorationRole))
-            slice->setColor(new_color);
-    }
+    QList<QPieSlice*> slices_list = slices->slices();
+    int slice_index = 0;
+    for(QList<QPieSlice*>::const_iterator i = slices_list.begin(); i != slices_list.end() && *i != slice; ++i, ++slice_index);
+    changeSliceColor(slice_index);
+}
+
+void PieChartWidget::changeColor(){
+    int index = series->currentIndex();
+    if(index != -1)
+        changeSliceColor(index);
 }
 
 

@@ -17,15 +17,16 @@ void LineChartWidget::connectLineModelSignals() const{
 }
 
 void LineChartWidget::connectSignals() const{
+    QObject::connect(color, SIGNAL(clicked(bool)), this, SLOT(changeLineColor()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentLine(int)));
     QObject::connect(points, SIGNAL(currentIndexChanged(int)), this, SLOT(currentPoint(int)));
     QObject::connect(add_serie, SIGNAL(clicked()), this, SLOT(userInsertLine()));
     QObject::connect(remove_serie, SIGNAL(clicked()), this, SLOT(userRemoveLine()));
     QObject::connect(insert_point, SIGNAL(clicked()), this, SLOT(userInsertPoint()));
     QObject::connect(remove_point, SIGNAL(clicked()), this, SLOT(userRemovePoint()));
-    QObject::connect(line_name, SIGNAL(editingFinished()), this, SLOT(userChangeLineName()));
-    QObject::connect(point_x_value, SIGNAL(editingFinished()), this, SLOT(userChangePointValue()));
-    QObject::connect(point_y_value, SIGNAL(editingFinished()), this, SLOT(userChangePointValue()));
+    QObject::connect(line_name, SIGNAL(returnPressed()), this, SLOT(userChangeLineName()));
+    QObject::connect(point_x_value, SIGNAL(returnPressed()), this, SLOT(userChangePointValue()));
+    QObject::connect(point_y_value, SIGNAL(returnPressed()), this, SLOT(userChangePointValue()));
     QObject::connect(remove_all_points, SIGNAL(clicked(bool)), this, SLOT(userRemoveAllPoints()));
 
     connectLineModelSignals();
@@ -36,10 +37,14 @@ void LineChartWidget::configChartWidgetItems() const{
     serie_info->setTitle("Line");
     add_serie->setText("Add Line");
     remove_serie->setText("Remove Line");
+    chart_info_layout->insertRow(1, "Lines", series);
 }
 
 void LineChartWidget::configLineChartWidgetItems() const{
-    serie_info_layout->addRow("Line name", line_name);
+    QHBoxLayout *line_name_layout = new QHBoxLayout();
+    line_name_layout->addWidget(line_name);
+    line_name_layout->addWidget(color);
+    serie_info_layout->addRow("Line name", line_name_layout);
     serie_info_layout->addRow(point_info);
     point_info_layout->addRow("Points", points);
     point_info_layout->addRow("X value", point_x_value);
@@ -61,6 +66,7 @@ void LineChartWidget::configInitialQLineSeries(){
         QLineSeries * new_line = new QLineSeries();
         QModelIndex new_line_model_index = model->index(i, 0);
         new_line->setName(model->data(new_line_model_index).toString());
+        new_line->setColor(model->data(new_line_model_index, Qt::DecorationRole).value<QColor>());
         lines.push_back(new_line);
         configInitialQPointFsInQLineSeries(new_line_model_index);
         chart->addSeries(new_line);
@@ -108,12 +114,13 @@ void LineChartWidget::currentLine(int row){
         line_name->setText(series->currentText());
         points->setModel(model);
         points->setRootModelIndex(current_line_index);
-        points->setCurrentIndex(-1);
         points->setModelColumn(2);
+        points->setCurrentIndex(-1);
     }
     else
         current_line_index = QModelIndex();
     points->setCurrentIndex(-1);
+    line_name->setStyleSheet("");
 }
 
 void LineChartWidget::userInsertLine(){
@@ -133,8 +140,13 @@ void LineChartWidget::userRemoveLine(){
 }
 
 void LineChartWidget::userChangeLineName(){
-    if(model->index(series->currentIndex(), 0).isValid())
-        model->setData(model->index(series->currentIndex(), 0), line_name->text());
+    bool result = model->setData(model->index(series->currentIndex(), 0), line_name->text());
+    if(!result){
+        QMessageBox::warning(this, "Change Line Name", "Something goes wrong, rember that the name must by unique");
+        line_name->setStyleSheet("border: 1px solid red");
+    }
+    else
+        line_name->setStyleSheet("");
 }
 
 void LineChartWidget::currentPoint(int index){
@@ -191,6 +203,7 @@ void LineChartWidget::userChangePointValue(){
 void LineChartWidget::multipleLinesInserted(int row, int count){
     for(int i = 0; i < count; ++i){
         QLineSeries *new_line_series = new QLineSeries();
+        new_line_series->setColor(model->data(model->index(row, 0), Qt::DecorationRole).value<QColor>());
         lines.insert(row+i, new_line_series);
         chart->addSeries(new_line_series);
     }
@@ -228,4 +241,16 @@ void LineChartWidget::multiplePointsAtLineRemoved(int line_row, int point_row, i
 void LineChartWidget::pointAtLineChanged(int line_row, int row, double new_x, double new_y){
     lines[line_row]->replace(row, new_x, new_y);
     updateChartAxes();
+}
+
+
+void LineChartWidget::changeLineColor(){
+    int index = series->currentIndex();
+    if(index != -1){
+        QColor new_color = QColorDialog::getColor(lines[index]->color(), this, "Choose new line color");
+        if(new_color.isValid()){
+            if(model->setData(model->index(index, 0), new_color, Qt::DecorationRole))
+                lines[index]->setColor(new_color);
+        }
+    }
 }
