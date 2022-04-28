@@ -144,7 +144,7 @@ bool BarModel::setData(const QModelIndex &index, const QVariant &value, int role
 }
 
 QModelIndex BarModel::parent(const QModelIndex &child) const{
-    return QModelIndex();
+    return  QModelIndex();
 }
 
 QModelIndex BarModel::index(int row, int column, const QModelIndex &parent) const{

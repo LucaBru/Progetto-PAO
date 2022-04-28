@@ -39,11 +39,11 @@ public:
     ~PieChart();
     bool insertSlices(int row, int count);
     bool removeSlices(int row, int count);
-    Slice* getSlice(int index) const; //può tornare un nullptr
+    Slice* getSlice(int index) const;
     int slicesCount() const;
 
     bool changeSliceAtName(int index, const QString& new_name);
-    QJsonObject* parsing() const override; //da modificare per mantenere l'ordine
+    QJsonObject* parsing() const override;
 };
 
 #endif // PIECHART_H
