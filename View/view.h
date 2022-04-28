@@ -8,6 +8,10 @@ class View : public QObject{
     Q_OBJECT
 private:
     void manageOldChart() const;
+    void connectSignalsToSlot(QAction *open_from_file, QAction *new_pie_chart, QAction *new_line_chart, QAction *new_bar_chart);
+    
+    void connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar_chart, QAction *new_line_chart, QAction *open_from_file);
+    
 protected:
     QMainWindow *mainW;
     QToolBar *tool_bar;

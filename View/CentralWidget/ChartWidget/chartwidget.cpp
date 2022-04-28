@@ -2,7 +2,7 @@
 #include <QGridLayout>
 #include "Model/piemodel.h"
 
-void ChartWidget::connectSignalsAndSlot() const{
+void ChartWidget::connectSignalsToSlot() const{
     QObject::connect(chart_title, SIGNAL(editingFinished()), this, SLOT(changeTitle()));
     QObject::connect(save, SIGNAL(triggered(bool)), this, SLOT(saveChart()));
     QObject::connect(save_as, SIGNAL(triggered(bool)), this, SLOT(saveChartAs()));
@@ -29,7 +29,7 @@ ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, 
     save = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save.png"), "save");
     save_as = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save as.png"), "save as");
 
-    connectSignalsAndSlot();
+    connectSignalsToSlot();
 }
 
 void ChartWidget::createChartFromModel(){

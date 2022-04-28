@@ -16,7 +16,7 @@
 class ChartWidget : public CentralWidget{
     Q_OBJECT
 private:
-    void connectSignalsAndSlot() const;
+    void connectSignalsToSlot() const;
     void configChartWidgetItems();
 protected:
     Model *model;

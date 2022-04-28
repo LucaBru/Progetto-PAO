@@ -16,29 +16,30 @@ void View::manageOldChart() const{
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
         int ret = msgBox.exec();
-        switch (ret){
-            case QMessageBox::Save:
-                static_cast<ChartWidget*>(mainW->centralWidget())->saveChart();
-                break;
-            default:
-                delete mainW->centralWidget();
-                break;
-        }
+        if(ret == QMessageBox::Save)
+            static_cast<ChartWidget*>(mainW->centralWidget())->saveChart();
     }
 }
 
-View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()), tool_bar(new QToolBar()){
-    QAction *open_from_file = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\open.png"), "open from file");
-    QAction *new_pie_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\pie.png"), "new pie chart");
-    QAction *new_line_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\line.png"), "new line chart");
-    QAction *new_bar_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\bar.png"), "new bar chart");
-
-    mainW->addToolBar(tool_bar);
-
+void View::connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar_chart, QAction *new_line_chart, QAction *open_from_file) const{
     QObject::connect(open_from_file, SIGNAL(triggered(bool)), this,  SLOT(openFromFile()));
     QObject::connect(new_pie_chart, SIGNAL(triggered(bool)), this, SLOT(newPieChart()));
     QObject::connect(new_line_chart, SIGNAL(triggered(bool)), this, SLOT(newLineChart()));
     QObject::connect(new_bar_chart, SIGNAL(triggered(bool)), this, SLOT(newBarChart()));
+}
+
+void View::configToolBarItems() const{
+    QAction *open_from_file = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\open.png"), "open from file");
+    QAction *new_pie_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\pie.png"), "new pie chart");
+    QAction *new_line_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\line.png"), "new line chart");
+    QAction *new_bar_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\bar.png"), "new bar chart");
+    connectToolBarSignalsToSlots(new_pie_chart, new_bar_chart, new_line_chart, open_from_file);
+
+}
+
+View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()), tool_bar(new QToolBar()){
+    configToolBarItems();
+    mainW->addToolBar(tool_bar);
 }
 
 View::~View(){

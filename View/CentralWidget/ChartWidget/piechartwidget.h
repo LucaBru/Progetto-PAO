@@ -8,8 +8,8 @@ class PieChartWidget : public ChartWidget{
 private:
     void connectSignalsToSlots() const;
     void connectPieModelSignalsToSlots() const;
-    void configChartWidgetItems() const;
-    void configPieChartWidgetItems() const;
+    void configChartWidgetItems();
+    void configPieChartWidgetItems();
     void getSlicesFromModel();
     void changeSliceColor(int slice_index);
 

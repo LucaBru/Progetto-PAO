@@ -22,7 +22,7 @@ void PieChartWidget::connectSignalsToSlots() const{
 
 }
 
-void PieChartWidget::configChartWidgetItems() const{
+void PieChartWidget::configChartWidgetItems(){
     chart->addSeries(slices);
     add_serie->setText("Add Slice");
     remove_serie->setText("Remove Slice");
@@ -31,7 +31,7 @@ void PieChartWidget::configChartWidgetItems() const{
     chart_info_layout->insertRow(1, "Slices", series);
 }
 
-void PieChartWidget::configPieChartWidgetItems() const{
+void PieChartWidget::configPieChartWidgetItems(){
     QHBoxLayout *slice_name_layout = new QHBoxLayout();
     slice_name_layout->addWidget(slice_name);
     slice_name_layout->addWidget(color);
