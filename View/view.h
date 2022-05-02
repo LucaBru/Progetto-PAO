@@ -10,6 +10,7 @@ private:
     void manageOldChart() const;
     void connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar_chart, QAction *new_line_chart, QAction *open_from_file) const;
     void configToolBarItems() const;
+    QWidget* initialCentralWidget() const;
     
 protected:
     QMainWindow *mainW;

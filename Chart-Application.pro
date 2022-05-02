@@ -22,6 +22,8 @@ SOURCES += \
     Model/model.cpp \
     Model/piemodel.cpp \
     View/CentralWidget/ChartWidget/barchartwidget.cpp \
+    #View/CentralWidget/ChartWidget/chartUserInputManager/chartuserinputmanager.cpp \
+    #View/CentralWidget/ChartWidget/chartUserInputManager/piechartuserinputmanager.cpp \
     View/CentralWidget/ChartWidget/chartwidget.cpp \
     View/CentralWidget/ChartWidget/linechartwidget.cpp \
     View/CentralWidget/ChartWidget/piechartwidget.cpp \
@@ -39,6 +41,8 @@ HEADERS += \
     Model/model.h \
     Model/piemodel.h \
     View/CentralWidget/ChartWidget/barchartwidget.h \
+    #View/CentralWidget/ChartWidget/chartUserInputManager/chartuserinputmanager.h \
+    #View/CentralWidget/ChartWidget/chartUserInputManager/piechartuserinputmanager.h \
     View/CentralWidget/ChartWidget/chartwidget.h \
     View/CentralWidget/ChartWidget/linechartwidget.h \
     View/CentralWidget/ChartWidget/piechartwidget.h \

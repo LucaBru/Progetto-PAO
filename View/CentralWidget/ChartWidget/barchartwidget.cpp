@@ -182,12 +182,15 @@ void BarChartWidget::getSetsFromModel(){
 }
 
 void BarChartWidget::getCategoriesFromModel(){
-    for(int i = 0; i < model->columnCount()-1; ++i){
-        QString cat_name = static_cast<BarModel*>(model)->getCategoryNameAt(i);
-        categories_axis->append(cat_name);
-        CategoryWidget *cat_item = new CategoryWidget(this, i);
-        cat_item->setCategoryName(cat_name);
-        cat_items_layout->addRow(cat_item);
+    if(model->columnCount()-1 > 0){
+        serie_info_layout->removeRow(add_new_category);
+        for(int i = 0; i < model->columnCount()-1; ++i){
+            QString cat_name = static_cast<BarModel*>(model)->getCategoryNameAt(i);
+            categories_axis->append(cat_name);
+            CategoryWidget *cat_item = new CategoryWidget(this, i);
+            cat_item->setCategoryName(cat_name);
+            cat_items_layout->addRow(cat_item);
+        }
     }
 }
 

@@ -4,6 +4,7 @@
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
+    a.setApplicationName("ChartManager");
     a.setWindowIcon(QIcon("..\\Chart-Application\\icon\\app.ico"));
     View *view = new View();
     view->show();

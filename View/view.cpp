@@ -28,7 +28,24 @@ void View::connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar
     QObject::connect(new_bar_chart, SIGNAL(triggered(bool)), this, SLOT(newBarChart()));
 }
 
+QWidget* View::initialCentralWidget() const
+{
+    QWidget *w = new QWidget();
+    QLabel *initial_text = new QLabel("Manage your chart with ChartManager");
+    QFont *f = new QFont();
+    f->setBold(true);
+    f->setPointSize(36);
+    initial_text->setStyleSheet("color:#d6d6d6");
+    initial_text->setFont(*f);
+    initial_text->setAlignment(Qt::AlignCenter);
+    QHBoxLayout *l = new QHBoxLayout(w);
+    l->addWidget(initial_text);
+    return w;
+}
+
 void View::configToolBarItems() const{
+
+    tool_bar->setIconSize(QSize(48, 48));
     QAction *open_from_file = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\open.png"), "open from file");
     QAction *new_pie_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\pie.png"), "new pie chart");
     QAction *new_line_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\line.png"), "new line chart");
@@ -39,7 +56,8 @@ void View::configToolBarItems() const{
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()), tool_bar(new QToolBar()){
     configToolBarItems();
-    mainW->addToolBar(tool_bar);
+    mainW->setCentralWidget(initialCentralWidget());
+    mainW->addToolBar(Qt::LeftToolBarArea, tool_bar);
 }
 
 View::~View(){
