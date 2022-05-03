@@ -63,6 +63,8 @@ private:
     void getCategoriesFromModel();
     void changeSetColor(int set_index);
     void resetCategoryBorderStyle();
+    void updateValueAxisRangeOnRemovedSet(QBarSet* set);
+    double findNewValueAxisMaxWithOutSet(QBarSet* set =nullptr) const;
 
 public:
     BarChartWidget(View *v, Model *m, QWidget *parent =nullptr);
@@ -85,7 +87,6 @@ private slots:
     void setAtChangedValue(int set_index, int value_index, double new_value);
     void categoryAtChangedName(int index, const QString& new_name);
     void currentSetChanged(int index);
-    void updateYAxisRange(double val);
     void barClicked(int index, QBarSet* set);
     void changeColor();
 };

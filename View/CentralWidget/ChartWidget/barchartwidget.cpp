@@ -163,8 +163,14 @@ void BarChartWidget::inizializeNewCategorySetValue(int column, int count){
 
 void BarChartWidget::removeSetsValueAtIndex(int index){
     QList<QBarSet*> sets = bar_serie->barSets();
-    for(QList<QBarSet*>::iterator i = sets.begin(); i != sets.end(); ++i)
+    bool is_max_removed = false;
+    double max = value_axis->max();
+    for(QList<QBarSet*>::iterator i = sets.begin(); i != sets.end(); ++i){
+        is_max_removed = (!is_max_removed) ? (*i)->at(index)*5/4 == max : true;
         (*i)->remove(index);
+    }
+    if(is_max_removed)
+        value_axis->setMax(findNewValueAxisMaxWithOutSet());
 }
 
 void BarChartWidget::getSetsFromModel(){
@@ -173,9 +179,10 @@ void BarChartWidget::getSetsFromModel(){
         QBarSet *set = new QBarSet(model->data(index).toString());
         set->setColor(model->data(index, Qt::DecorationRole).value<QColor>());
         for(int j = 0; j < model->columnCount()-1; ++j){
-            double val = model->data(model->index(i, j+1)).toDouble();
-            set->append(val);
-            updateYAxisRange(val);
+            double value = model->data(model->index(i, j+1)).toDouble();
+            set->append(value);
+            if(value*5/4 > value_axis->max())
+                value_axis->setMax(value*5/4);
         }
         bar_serie->append(set);
     }
@@ -207,18 +214,33 @@ void BarChartWidget::resetCategoryBorderStyle(){
         static_cast<CategoryWidget*>(cat_items_layout->itemAt(i, QFormLayout::SpanningRole)->widget())->setDefaultBorder();
 }
 
-BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : ChartWidget(v, m, p),  bar_serie(new QBarSeries()), add_new_category(new QPushButton("Add New Category")), cat_items_layout(new QFormLayout()), value_axis(new QValueAxis()), categories_axis(new QBarCategoryAxis()), set_name(new QLineEdit()){
-    chart->addSeries(bar_serie);
+double BarChartWidget::findNewValueAxisMaxWithOutSet(QBarSet* set) const{
+    int max = 1;
+    QList<QBarSet*> bar_sets = bar_serie->barSets();
+    for(QList<QBarSet*>::const_iterator i = bar_sets.begin(); i != bar_sets.end(); ++i){
+        QBarSet *current = *i;
+        if(current != set)
+            for(int j = 0; j < current->count(); ++j)
+                max = current->at(j)*5/4 > max ? current->at(j)*5/4 : max;
+    }
+    return max;
+}
+
+BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : ChartWidget(v, m, p),  bar_serie(new QBarSeries(chart)), add_new_category(new QPushButton("Add New Category")), cat_items_layout(new QFormLayout()), value_axis(new QValueAxis()), categories_axis(new QBarCategoryAxis()), set_name(new QLineEdit()){
     configChartWidgetItems();
     configBarChartWidgetItems();
     connectSignalsAndSlots();
     connectBarModelSignals();
 
-    value_axis->setRange(0, 5);
+    value_axis->setRange(0, 1);
     chart->addAxis(categories_axis, Qt::AlignBottom);
-    bar_serie->attachAxis(categories_axis);
     chart->addAxis(value_axis, Qt::AlignLeft);
+
+    chart->addSeries(bar_serie);
+
+    bar_serie->attachAxis(categories_axis);
     bar_serie->attachAxis(value_axis);
+
 }
 
 void BarChartWidget::createChartFromModel(){
@@ -230,7 +252,7 @@ void BarChartWidget::createChartFromModel(){
 
 void BarChartWidget::removeCategory(int index){
     model->removeColumns(index+1, 1);
-    if(!cat_items_layout->rowCount()){
+    if(cat_items_layout->rowCount() == 0){
         add_new_category = new QPushButton("Add New Category");
         serie_info_layout->insertRow(1, add_new_category);
         QObject::connect(add_new_category, SIGNAL(clicked(bool)), this, SLOT(userInsertFirstCategory()));
@@ -315,19 +337,10 @@ void BarChartWidget::multipleCategoriesInserted(int column, int count){
 }
 
 void BarChartWidget::multipleCategoriesRemoved(int column, int count){
-    if(column >= 0 && column+count-1 < cat_items_layout->count() && column+count-1 < categories_axis->count()){
-        if(categories_axis->count() == 1){
-            categories_axis->clear();
-            cat_items_layout->removeRow(0);
-            removeSetsValueAtIndex(0);
-        }
-        else{
-            for(int i = column; i < column+count; ++i){
-                categories_axis->remove(categories_axis->at(i));
-                cat_items_layout->removeRow(i);
-                removeSetsValueAtIndex(i);
-            }
-        }
+    for(int i = column; i < column+count; ++i){
+        categories_axis->remove(categories_axis->at(i));
+        removeSetsValueAtIndex(i);
+        cat_items_layout->removeRow(i);
     }
     updateIndexOfCategoryWidgetItems(column, 0);
 }
@@ -345,8 +358,11 @@ void BarChartWidget::categoryAtChangedName(int index, const QString &new_name){
 
 void BarChartWidget::multipleSetsRemoved(int row, int count){
     if(row >= 0 && row+count-1 < bar_serie->barSets().size() && count > 0){
-        for(int i = row; i < row+count; ++i)
-            bar_serie->remove(bar_serie->barSets()[i]);
+        for(int i = row; i < row+count; ++i){
+            QBarSet *set_to_remove = bar_serie->barSets()[i];
+            updateValueAxisRangeOnRemovedSet(set_to_remove);
+            bar_serie->remove(set_to_remove);
+        }
     }
 }
 
@@ -361,8 +377,13 @@ void BarChartWidget::setAtChangedValue(int set_index, int value_index, double ne
         QBarSet *set = bar_serie->barSets()[set_index];
         value_index--;
         if(value_index >= 0 && value_index < set->count()){
-            set->replace(value_index, new_value);
-            updateYAxisRange(new_value);
+            double old_value = set->at(value_index);
+            set->replace(value_index, new_value); 
+            if(new_value*5/4 > value_axis->max())
+                value_axis->setMax(new_value*5/4);
+            if(old_value*5/4 == value_axis->max())
+                //se ciò è vero significa che ho diminuito il valore massimo => potrei avere un massimo più piccolo
+                value_axis->setMax(findNewValueAxisMaxWithOutSet());
         }
     }
 }
@@ -374,11 +395,6 @@ void BarChartWidget::currentSetChanged(int index){
     resetCategoryBorderStyle();
 }
 
-void BarChartWidget::updateYAxisRange(double val){
-    double bound = val * 5 / 4;
-    if(bound > value_axis->max())
-        value_axis->setMax(bound);
-}
 
 void BarChartWidget::barClicked(int index, QBarSet *set){
     int set_index = 0;
@@ -391,6 +407,15 @@ void BarChartWidget::changeColor(){
     int index = series->currentIndex();
     if(index != -1)
         changeSetColor(index);
+}
+
+void BarChartWidget::updateValueAxisRangeOnRemovedSet(QBarSet* set){
+    double max = value_axis->max();
+    bool is_max_delete = false;
+    for(int i = 0; i < set->count(); ++i)
+        is_max_delete = (!is_max_delete) ? max/5*4 == set->at(i) : true;
+    if(is_max_delete)
+        value_axis->setMax(findNewValueAxisMaxWithOutSet(set));
 }
 
 
