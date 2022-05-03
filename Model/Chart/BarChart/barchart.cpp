@@ -91,14 +91,14 @@ void BarChart::destroySets(BarChart &from){
 bool BarChart::isSetNameValid(const QString &name) const{
     bool result = true;
     for(vector<Set*>::const_iterator i = sets.begin(); i != sets.end() && result; ++i)
-        result = (*i)->getName().compare(name, Qt::CaseInsensitive);
+        result = (*i)->getName().compare(name);
     return result;
 }
 
 bool BarChart::isCategoryNameValid(const QString &name) const{
     bool result = !name.isEmpty();
     for(vector<QString>::const_iterator i = categories.begin(); i != categories.end() && result; ++i)
-        result = i->compare(name, Qt::CaseInsensitive);
+        result = i->compare(name);
     return result;
 }
 
