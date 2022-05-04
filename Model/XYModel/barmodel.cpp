@@ -1,4 +1,5 @@
 #include "barmodel.h"
+#include "Model/Chart/XYChart/BarChart/barchart.h"
 
 QVariant BarModel::getSetName(const QModelIndex &index) const{
     QVariant result;
@@ -56,7 +57,7 @@ bool BarModel::setSetColor(const QModelIndex &index, const QColor &color){
     return result;
 }
 
-BarModel::BarModel(View *v, const QJsonObject &obj, QObject *parent) : Model(v, (obj.isEmpty()) ? new BarChart() : new BarChart(obj), parent){}
+BarModel::BarModel(View *v, const QJsonObject &obj, QObject *parent) : XYModel(v, (obj.isEmpty()) ? new BarChart() : new BarChart(obj), parent){}
 
 int BarModel::rowCount(const QModelIndex &parent) const{
     if(!parent.isValid())
@@ -171,8 +172,6 @@ bool BarModel::isCategoryNameValid(const QString &name) const{
 QString BarModel::getCategoryNameAt(int index) const{
     return static_cast<BarChart*>(chart)->getCategoryNameAt(index);
 }
-
-
 
 
 /*

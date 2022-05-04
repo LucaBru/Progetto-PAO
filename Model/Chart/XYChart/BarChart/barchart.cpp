@@ -157,16 +157,16 @@ bool BarChart::isBarChartConsistent(const QJsonObject &obj){
     return result;
 }
 
-BarChart::BarChart(const QString &title) : Chart(title){}
+BarChart::BarChart(const QString &title) : XYChart(title){}
 
-BarChart::BarChart(const QJsonObject &obj) : Chart(obj){
+BarChart::BarChart(const QJsonObject &obj) : XYChart(obj){
     if(isBarChartConsistent(obj)){
         getSetsFromJson(obj.value("sets").toArray());
         getCategoriesNameJson(obj.value("cat").toArray());
     }
 }
 
-BarChart::BarChart(const BarChart &chart) : Chart(chart), sets(copySets(chart)){}
+BarChart::BarChart(const BarChart &chart) : XYChart(chart), sets(copySets(chart)){}
 
 BarChart& BarChart::operator =(const BarChart& chart){
     if(this != & chart){
@@ -258,7 +258,7 @@ int BarChart::categoriesSize() const{
 }
 
 QJsonObject* BarChart::parsing() const{
-    QJsonObject *obj = Chart::parsing();
+    QJsonObject *obj = XYChart::parsing();
     obj->insert("type", "bar");
     QJsonArray json_sets, json_cat;
     for(vector<Set*>::const_iterator i = sets.cbegin(); i != sets.cend(); ++i){
@@ -270,5 +270,4 @@ QJsonObject* BarChart::parsing() const{
     obj->insert("cat", json_cat);
     return obj;
 }
-
 

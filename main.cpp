@@ -14,6 +14,6 @@ int main(int argc, char *argv[]){
 
 /*
  * Provare ad eliminare delle categorie => risolvere bug
- *
+ * Rivedere LineChart->updateChartAxes()
  *
  */

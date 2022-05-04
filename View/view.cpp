@@ -1,10 +1,10 @@
 #include "view.h"
 #include "View/CentralWidget/ChartWidget/piechartwidget.h"
 #include "Model/piemodel.h"
-#include "View/CentralWidget/ChartWidget/linechartwidget.h"
-#include "Model/linemodel.h"
-#include "View/CentralWidget/ChartWidget/barchartwidget.h"
-#include "Model/barmodel.h"
+#include "View/CentralWidget/ChartWidget/XYChartWidget/linechartwidget.h"
+#include "Model/XYModel/linemodel.h"
+#include "View/CentralWidget/ChartWidget/XYChartWidget/barchartwidget.h"
+#include "Model/XYModel/barmodel.h"
 #include <QToolBar>
 #include <QFileDialog>
 
@@ -32,11 +32,11 @@ QWidget* View::initialCentralWidget() const
 {
     QWidget *w = new QWidget();
     QLabel *initial_text = new QLabel("Manage your chart with ChartManager");
-    QFont *f = new QFont();
-    f->setBold(true);
-    f->setPointSize(36);
+    QFont f;
+    f.setBold(true);
+    f.setPointSize(36);
     initial_text->setStyleSheet("color:#d6d6d6");
-    initial_text->setFont(*f);
+    initial_text->setFont(f);
     initial_text->setAlignment(Qt::AlignCenter);
     QHBoxLayout *l = new QHBoxLayout(w);
     l->addWidget(initial_text);
@@ -45,7 +45,7 @@ QWidget* View::initialCentralWidget() const
 
 void View::configToolBarItems() const{
 
-    tool_bar->setIconSize(QSize(48, 48));
+    tool_bar->setIconSize(QSize(36, 36));
     QAction *open_from_file = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\open.png"), "open from file");
     QAction *new_pie_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\pie.png"), "new pie chart");
     QAction *new_line_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\line.png"), "new line chart");

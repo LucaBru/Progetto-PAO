@@ -1,11 +1,10 @@
 #ifndef BARMODEL_H
 #define BARMODEL_H
-#include "Model/model.h"
-#include "Model/Chart/BarChart/barchart.h"
+#include "Model/XYModel/xymodel.h"
 #include <vector>
 using std::vector;
 
-class BarModel : public Model{
+class BarModel : public XYModel{
     Q_OBJECT
 private:
     QVariant getSetName(const QModelIndex& index) const;

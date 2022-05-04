@@ -1,6 +1,6 @@
 #ifndef LINECHART_H
 #define LINECHART_H
-#include "Model/Chart/chart.h"
+#include "Model/Chart/XYChart/xychart.h"
 #include <cstdlib>
 #include <QJsonArray>
 #include <vector>
@@ -44,13 +44,7 @@ private:
     Point* findFirstValidPointAfter(int point_index) const;
     void confPointsFromQJsonObject(const QJsonObject& line);
 public:
-    Line(const QString& name = QString(), const QColor& color =QColor(rand()%256, rand()%256, rand()%256)); //riprendere da qui:
-    /*
-     * Implementare nel costruttore l'aggiunta del colore alla linea
-     * Aggiungerlo nella fase di parsing
-     * Aggiungerlo al costruttore comn parametro QJSonObject
-     * Aggiungere in LineChartWidget nello slot collegato al segnale multipleLineInserted l'aggiunta del colore (il quale deve essere preso dal model)
-     */
+    Line(const QString& name = QString(), const QColor& color =QColor(rand()%256, rand()%256, rand()%256));
     Line(const QJsonObject& line);
     //gestione della memoria profonda
     Line(const Line& line);
@@ -70,9 +64,9 @@ public:
     QJsonArray getYValuesAsJsonArray() const;
 };
 
-class LineChart : public Chart{
+class LineChart : public XYChart{
 private:
-    //inserisce la linea solamnete se il nome è valido (ovvero se non ci sono altre linee con tale nome)
+    //inserisce la linea solamente se il nome è valido (ovvero se non ci sono altre linee con tale nome)
     void confLinesFromQJsonObject(const QJsonArray& lines_from_json);
     bool existLineName(const QString& line_name) const;
     QJsonArray getLinesAsJsonArray() const;

@@ -1,8 +1,8 @@
 #ifndef LINEMODEL_H
 #define LINEMODEL_H
-#include "Model/model.h"
+#include "Model/XYModel/xymodel.h"
 
-class LineModel : public Model{
+class LineModel : public XYModel{
     Q_OBJECT
 private:
     bool changeLineName(const QModelIndex& line_index, const QString& new_line_name);

@@ -1,0 +1,40 @@
+{
+    "lines": [
+        {
+            "color": "#7582e6",
+            "name": "Linea 1",
+            "x values": [
+                0,
+                2,
+                4,
+                5
+            ],
+            "y values": [
+                5,
+                1,
+                2,
+                10
+            ]
+        },
+        {
+            "color": "#93413a",
+            "name": "Linea 2",
+            "x values": [
+                0,
+                2,
+                3,
+                5
+            ],
+            "y values": [
+                2,
+                3,
+                8,
+                1
+            ]
+        }
+    ],
+    "title": "Line Chart Example 2",
+    "type": "line",
+    "x axis title": "x axis title",
+    "y axis title": "y axis title"
+}

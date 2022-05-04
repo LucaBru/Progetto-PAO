@@ -1,6 +1,6 @@
 #ifndef BARCHART_H
 #define BARCHART_H
-#include "Model/Chart/chart.h"
+#include "Model/Chart/XYChart/xychart.h"
 #include <QColor>
 #include <vector>
 using std::vector;
@@ -27,7 +27,7 @@ public:
     QJsonObject parsing() const;
 };
 
-class BarChart : public Chart{
+class BarChart : public XYChart{
 private:
     static vector<Set*> copySets(const BarChart& from);
     static void destroySets(BarChart& from);

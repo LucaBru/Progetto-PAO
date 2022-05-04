@@ -1,7 +1,7 @@
 #include "model.h"
 #include "Model/Chart/PieChart/piechart.h"
-#include "Model/Chart/LineChart/linechart.h"
-#include "Model/Chart/BarChart/barchart.h"
+#include "Model/Chart/XYChart/LineChart/linechart.h"
+#include "Model/Chart/XYChart/BarChart/barchart.h"
 #include <QFile>
 #include <QIODevice>
 

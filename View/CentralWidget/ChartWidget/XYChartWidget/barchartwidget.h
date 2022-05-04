@@ -1,6 +1,6 @@
 #ifndef BARCHARTWIDGET_H
 #define BARCHARTWIDGET_H
-#include "View/CentralWidget/ChartWidget/chartwidget.h"
+#include "View/CentralWidget/ChartWidget/XYChartWidget/xychartwidget.h"
 #include <QToolButton>
 #include <QBarSeries>
 #include <QBarSet>
@@ -21,7 +21,7 @@ private:
     QLineEdit *category_name;
     QLineEdit *set_value;
     QToolButton *add_new_category;
-
+    QLineEdit *value_axis_label;
 
     void confWidgetItems();
     void connectSignalsAndSlots() const;
@@ -39,12 +39,11 @@ private slots:
     void userChangeSetValue();
 };
 
-class BarChartWidget : public ChartWidget{
+class BarChartWidget : public XYChartWidget{
     Q_OBJECT
 private:
     QBarSeries *bar_serie;
     QBarCategoryAxis *categories_axis;
-    QValueAxis *value_axis;
     QLineEdit *set_name;
     QPushButton *add_new_category;
     QFormLayout *cat_items_layout;

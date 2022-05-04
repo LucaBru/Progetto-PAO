@@ -2,14 +2,17 @@
 #include <QGridLayout>
 #include "Model/piemodel.h"
 
-void ChartWidget::connectSignalsToSlot() const{
+void ChartWidget::connectSignalsToSlots() const{
     QObject::connect(chart_title, SIGNAL(editingFinished()), this, SLOT(changeTitle()));
     QObject::connect(save, SIGNAL(triggered(bool)), this, SLOT(saveChart()));
     QObject::connect(save_as, SIGNAL(triggered(bool)), this, SLOT(saveChartAs()));
 }
 
 void ChartWidget::configChartWidgetItems(){
-    chart_title->setText(model->getChartTitle());
+    QFont f;
+    f.setBold(true);
+    f.setPointSize(18);
+    chart->setTitleFont(f);
     main_layout->addWidget(chart_info, 0, 0);
     main_layout->addWidget(serie_info, 1, 0);
     main_layout->addWidget(chart_view, 0, 1, 2, 1);
@@ -29,11 +32,13 @@ ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, 
     save = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save.png"), "save");
     save_as = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save as.png"), "save as");
 
-    connectSignalsToSlot();
+    connectSignalsToSlots();
 }
 
 void ChartWidget::createChartFromModel(){
-    chart->setTitle(model->getChartTitle());
+    QString title = model->getChartTitle();
+    chart->setTitle(title);
+    chart_title->setText(title);
 }
 
 ChartWidget::~ChartWidget(){

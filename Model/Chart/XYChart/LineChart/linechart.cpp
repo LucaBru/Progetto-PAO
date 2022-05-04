@@ -241,13 +241,13 @@ void LineChart::destroyLines(LineChart &chart){
         delete *i;
 }
 
-LineChart::LineChart(const QString &t) : Chart(t){}
+LineChart::LineChart(const QString &t) : XYChart(t){}
 
-LineChart::LineChart(const QJsonObject &obj) : Chart(obj){
+LineChart::LineChart(const QJsonObject &obj) : XYChart(obj){
     confLinesFromQJsonObject(obj.value("lines").toArray());
 }
 
-LineChart::LineChart(const LineChart& chart) : Chart(chart), lines(copyLines(chart)){}
+LineChart::LineChart(const LineChart& chart) : XYChart(chart), lines(copyLines(chart)){}
 
 LineChart& LineChart::operator =(const LineChart& chart){
     if(this != &chart){
@@ -302,7 +302,7 @@ bool LineChart::removeLines(int index, int count){
 }
 
 QJsonObject* LineChart::parsing() const{
-    QJsonObject* obj = Chart::parsing();
+    QJsonObject* obj = XYChart::parsing();
     obj->insert("type", "line");
     obj->insert("lines", getLinesAsJsonArray());
     return obj;

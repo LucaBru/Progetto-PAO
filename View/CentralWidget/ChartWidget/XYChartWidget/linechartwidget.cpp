@@ -2,7 +2,8 @@
 #include <QSortFilterProxyModel>
 #include <QDoubleValidator>
 #include <QLocale>
-#include "Model/linemodel.h"
+#include "Model/Chart/XYChart/LineChart/linechart.h"
+#include "Model/XYModel/linemodel.h"
 
 void LineChartWidget::connectLineModelSignals() const{
     LineModel *line_model = dynamic_cast<LineModel*>(model);
@@ -16,7 +17,7 @@ void LineChartWidget::connectLineModelSignals() const{
     }
 }
 
-void LineChartWidget::connectSignals() const{
+void LineChartWidget::connectSignalsToSlots() const{
     QObject::connect(color, SIGNAL(clicked(bool)), this, SLOT(changeLineColor()));
     QObject::connect(series, SIGNAL(currentIndexChanged(int)), this, SLOT(currentLine(int)));
     QObject::connect(points, SIGNAL(currentIndexChanged(int)), this, SLOT(currentPoint(int)));
@@ -64,14 +65,15 @@ void LineChartWidget::configInitialQLineSeries(){
     int lines_count = model->rowCount();
     for(int i = 0; i < lines_count; ++i){
         QLineSeries * new_line = new QLineSeries();
+        chart->addSeries(new_line);
         QModelIndex new_line_model_index = model->index(i, 0);
         new_line->setName(model->data(new_line_model_index).toString());
         new_line->setColor(model->data(new_line_model_index, Qt::DecorationRole).value<QColor>());
+        new_line->attachAxis(x_axis);
+        new_line->attachAxis(y_axis);
         lines.push_back(new_line);
         configInitialQPointFsInQLineSeries(new_line_model_index);
-        chart->addSeries(new_line);
     }
-
 }
 
 void LineChartWidget::configInitialQPointFsInQLineSeries(const QModelIndex& line_index){
@@ -80,31 +82,40 @@ void LineChartWidget::configInitialQPointFsInQLineSeries(const QModelIndex& line
         for(int i = 0; i < points_count; ++i){
             double xvalue = model->data(model->index(i, 0, line_index)).toDouble();
             double yvalue = model->data(model->index(i, 1, line_index)).toDouble();
+            updateAxisRangeValue(xvalue, yvalue);
             lines[line_index.row()]->append(QPointF(xvalue, yvalue));
         }
     }
 }
 
-void LineChartWidget::updateChartAxes(){
-    for(QList<QLineSeries*>::const_iterator i = lines.constBegin(); i != lines.constEnd(); ++i){
-        chart->removeSeries(*i);
-        chart->addSeries(*i);
+void LineChartWidget::updateAxisRangeValue(double point_x, double point_y){
+    QValueAxis *x = static_cast<QValueAxis*>(x_axis);
+    QValueAxis *y = static_cast<QValueAxis*>(y_axis);
+    if(point_x < x->min() || point_x > x->max()){
+        if(point_x > x->max())
+            x->setMax(point_x);
+        else
+            x->setMin(point_x);
     }
-    chart->createDefaultAxes();
+    if(point_y < y->min() || point_y > y->max()){
+        if(point_y > y->max())
+            y->setMax(point_y);
+        else
+            y->setMin(point_y);
+    }
 }
 
-LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")), remove_all_points(new QPushButton("Remove All Points")){
+LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : XYChartWidget(new QValueAxis(), new QValueAxis(), v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")), remove_all_points(new QPushButton("Remove All Points")){
 
     chart_view->setRenderHint(QPainter::Antialiasing);
     configChartWidgetItems();
     configLineChartWidgetItems();
-    connectSignals();
+    connectSignalsToSlots();
 }
 
 void LineChartWidget::createChartFromModel(){
-    ChartWidget::createChartFromModel();
+    XYChartWidget::createChartFromModel();
     configInitialQLineSeries();
-    chart->createDefaultAxes();
     series->setCurrentIndex(-1);
 }
 
@@ -203,9 +214,11 @@ void LineChartWidget::userChangePointValue(){
 void LineChartWidget::multipleLinesInserted(int row, int count){
     for(int i = 0; i < count; ++i){
         QLineSeries *new_line_series = new QLineSeries();
-        new_line_series->setColor(model->data(model->index(row, 0), Qt::DecorationRole).value<QColor>());
-        lines.insert(row+i, new_line_series);
         chart->addSeries(new_line_series);
+        new_line_series->setColor(model->data(model->index(row, 0), Qt::DecorationRole).value<QColor>());
+        new_line_series->attachAxis(x_axis);
+        new_line_series->attachAxis(y_axis);
+        lines.insert(row+i, new_line_series);
     }
 }
 
@@ -213,7 +226,6 @@ void LineChartWidget::multipleLinesRemoved(int row, int count){
     for(int i = 0; i < count; ++i)
         chart->removeSeries(lines[row+i]);
     lines.erase(lines.begin()+row, lines.begin()+row+count);
-   updateChartAxes();
 }
 
 void LineChartWidget::multiplePointsAtLineInserted(int line_row, int point_row, int count){
@@ -228,19 +240,18 @@ void LineChartWidget::multiplePointsAtLineInserted(int line_row, int point_row, 
 
     double x_default_value = (default_value_from_index == -1) ? 0 : lines[line_row]->at(default_value_from_index).x();
     double y_default_value = (default_value_from_index == -1) ? 0 : lines[line_row]->at(default_value_from_index).y();
-
+    updateAxisRangeValue(x_default_value, y_default_value);
     for(int i = 0; i < count; ++i)
         lines[line_row]->insert(point_row+i, QPointF(x_default_value, y_default_value));
 }
 
 void LineChartWidget::multiplePointsAtLineRemoved(int line_row, int point_row, int count){
     lines[line_row]->removePoints(point_row, count);
-    updateChartAxes();
 }
 
 void LineChartWidget::pointAtLineChanged(int line_row, int row, double new_x, double new_y){
     lines[line_row]->replace(row, new_x, new_y);
-    updateChartAxes();
+    updateAxisRangeValue(new_x, new_y);
 }
 
 

@@ -1,42 +1,44 @@
 {
     "cat": [
-        "2017",
-        "2020"
+        "2020",
+        "2021"
     ],
     "sets": [
         {
-            "color": "#5a8cff",
+            "color": "#5fa4b3",
             "name": "Piemonte",
             "values": [
-                2567,
-                4275
+                4275,
+                5000
             ]
         },
         {
-            "color": "#ca874d",
+            "color": "#ad42a2",
             "name": "Sicilia",
             "values": [
-                5027,
-                4834
+                4834,
+                5100
             ]
         },
         {
-            "color": "#b883af",
+            "color": "#1a5cbf",
             "name": "Veneto",
             "values": [
-                4905,
-                4870
+                4870,
+                6000
             ]
         },
         {
-            "color": "#60ef2e",
-            "name": "liguria",
+            "color": "#b11618",
+            "name": "Liguria",
             "values": [
-                6833,
+                0,
                 0
             ]
         }
     ],
     "title": "Statistica demografica delle principali regioni italiane",
-    "type": "bar"
+    "type": "bar",
+    "x axis title": "",
+    "y axis title": ""
 }

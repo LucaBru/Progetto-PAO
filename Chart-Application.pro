@@ -13,38 +13,40 @@ ICON = "..\\Chart-Application\\icon\\app.icns" #necessario per icona app su mac.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Model/Chart/BarChart/barchart.cpp \
-    Model/Chart/LineChart/linechart.cpp \
+    Model/Chart/XYChart/BarChart/barchart.cpp \
+    Model/Chart/XYChart/LineChart/linechart.cpp \
     Model/Chart/PieChart/piechart.cpp \
+    Model/Chart/XYChart/xychart.cpp \
     Model/Chart/chart.cpp \
-    Model/barmodel.cpp \
-    Model/linemodel.cpp \
+    Model/XYModel/xymodel.cpp \
+    Model/XYModel/barmodel.cpp \
+    Model/XYModel/linemodel.cpp \
     Model/model.cpp \
     Model/piemodel.cpp \
-    View/CentralWidget/ChartWidget/barchartwidget.cpp \
-    #View/CentralWidget/ChartWidget/chartUserInputManager/chartuserinputmanager.cpp \
-    #View/CentralWidget/ChartWidget/chartUserInputManager/piechartuserinputmanager.cpp \
+    View/CentralWidget/ChartWidget/XYChartWidget/xychartwidget.cpp \
+    View/CentralWidget/ChartWidget/XYChartWidget/barchartwidget.cpp \
     View/CentralWidget/ChartWidget/chartwidget.cpp \
-    View/CentralWidget/ChartWidget/linechartwidget.cpp \
+    View/CentralWidget/ChartWidget/XYChartWidget/linechartwidget.cpp \
     View/CentralWidget/ChartWidget/piechartwidget.cpp \
     View/CentralWidget/centralwidget.cpp \
     View/view.cpp \
     main.cpp
 
 HEADERS += \
-    Model/Chart/BarChart/barchart.h \
-    Model/Chart/LineChart/linechart.h \
+    Model/Chart/XYChart/BarChart/barchart.h \
+    Model/Chart/XYChart/LineChart/linechart.h \
     Model/Chart/PieChart/piechart.h \
+    Model/Chart/XYChart/xychart.h \
     Model/Chart/chart.h \
-    Model/barmodel.h \
-    Model/linemodel.h \
+    Model/XYModel/xymodel.h \
+    Model/XYModel/barmodel.h \
+    Model/XYModel/linemodel.h \
     Model/model.h \
     Model/piemodel.h \
-    View/CentralWidget/ChartWidget/barchartwidget.h \
-    #View/CentralWidget/ChartWidget/chartUserInputManager/chartuserinputmanager.h \
-    #View/CentralWidget/ChartWidget/chartUserInputManager/piechartuserinputmanager.h \
+    View/CentralWidget/ChartWidget/XYChartWidget/xychartwidget.h \
+    View/CentralWidget/ChartWidget/XYChartWidget/barchartwidget.h \
     View/CentralWidget/ChartWidget/chartwidget.h \
-    View/CentralWidget/ChartWidget/linechartwidget.h \
+    View/CentralWidget/ChartWidget/XYChartWidget/linechartwidget.h \
     View/CentralWidget/ChartWidget/piechartwidget.h \
     View/CentralWidget/centralwidget.h \
     View/view.h

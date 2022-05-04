@@ -1,5 +1,5 @@
 #include "linemodel.h"
-#include "Model/Chart/LineChart/linechart.h"
+#include "Model/Chart/XYChart/LineChart/linechart.h"
 
 bool LineModel::changeLineName(const QModelIndex &line_index, const QString &new_line_name){
     bool result = false;
@@ -121,7 +121,7 @@ bool LineModel::removePointsInLine(int row, int count, const QModelIndex &line_p
     return result;
 }
 
-LineModel::LineModel(View *v, const QJsonObject& obj, QObject *parent) : Model(v, ((obj.isEmpty()) ? new LineChart() : new LineChart(obj)), parent){}
+LineModel::LineModel(View *v, const QJsonObject& obj, QObject *parent) : XYModel(v, ((obj.isEmpty()) ? new LineChart() : new LineChart(obj)), parent){}
 
 int LineModel::rowCount(const QModelIndex &parent) const{
     int count = 0;
