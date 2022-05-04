@@ -1,12 +1,11 @@
 #include "barchart.h"
-#include <cstdlib>
 #include <QJsonArray>
 
 // ------------------- SET ----------------------------------------------------
 
-Set::Set(int values_size) : name(""), color(rand()%256, rand()%256, rand()%256), values(values_size, 0){}
+Set::Set(int values_size, const QColor& c) : name(""), color(c), values(values_size, 0){}
 
-Set::Set(const QString &n, vector<double> &arr) : name(n),  color(rand()%256, rand()%256, rand()%256), values(arr){}
+Set::Set(const QString &n, vector<double> &arr, const QColor& c) : name(n),  color(c), values(arr){}
 
 Set::Set(const QJsonObject &obj) : name(obj.value("name").toString()), color(obj.value("color").toString()){
     QJsonArray jvalues = obj.value("values").toArray();

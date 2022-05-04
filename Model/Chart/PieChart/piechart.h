@@ -12,7 +12,7 @@ private:
     double value;
     QColor color;
 public:
-    Slice(const QString& n = QString(), double v = 0,  const QColor color = (rand()%256, rand()%256, rand()%256));
+    Slice(const QString& n = QString(), double v = 0, const QColor& color =QColor(rand()%256, rand()%256, rand()%256));
     Slice(const QJsonObject& obj);
     QString getName() const;
     double getValue() const;

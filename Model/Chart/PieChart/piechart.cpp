@@ -2,7 +2,7 @@
 #include <QJsonArray>
 
 // ------------- Slice ------------------------
-Slice::Slice(const QString &n, double v, const QColor c) : name(n), value(v), color(c){}
+Slice::Slice(const QString &n, double v, const QColor& c) : name(n), value(v), color(c){}
 
 Slice::Slice(const QJsonObject &obj) : name(obj.value("name").toString()), value(obj.value("value").toDouble()), color(obj.value("color").toString()){}
 

@@ -6,6 +6,8 @@
 #include <QColorDialog>
 #include <QColor>
 #include <QFrame>
+#include <iostream>
+using std::cout;
 
 // ---------------------- CATEGORYWIDGET -----------------------------------------------
 
@@ -217,13 +219,15 @@ void BarChartWidget::resetCategoryBorderStyle(){
 }
 
 double BarChartWidget::findNewValueAxisMaxWithOutSet(QBarSet* set) const{
-    int max = static_cast<QValueAxis*>(y_axis)->min();
+    double max = static_cast<QValueAxis*>(y_axis)->min();
+    cout << "max = " << max;
     QList<QBarSet*> bar_sets = bar_serie->barSets();
     for(QList<QBarSet*>::const_iterator i = bar_sets.begin(); i != bar_sets.end(); ++i){
         QBarSet *current = *i;
         if(current != set)
             for(int j = 0; j < current->count(); ++j)
-                max = current->at(j)*5/4 > max ? (current->at(j)*5/4) : max;
+                if(current->at(j)*5/4 > max)
+                    max = current->at(j)*5/4;
     }
     return max;
 }
@@ -258,11 +262,15 @@ void BarChartWidget::addCategory(int index){
     bool valid = false;
     QString cat_name;
     cat_name = QInputDialog::getText(this, "", "Insert new category name", QLineEdit::Normal, cat_name,  &valid);
-    if(valid && static_cast<BarModel*>(model)->isCategoryNameValid(cat_name)){
-        model->insertColumns(index+1, 1);
-        categories_axis->insert(index, cat_name);
-        static_cast<BarModel*>(model)->changeCategoryNameAt(index, cat_name);
-        valid = true;
+    if(valid){
+        if(static_cast<BarModel*>(model)->isCategoryNameValid(cat_name)){
+            model->insertColumns(index+1, 1);
+            categories_axis->insert(index, cat_name);
+            static_cast<BarModel*>(model)->changeCategoryNameAt(index, cat_name);
+            valid = true;
+        }
+        else
+            QMessageBox::warning(this, "Add Category", "Category's name must by unique");
     }
 }
 

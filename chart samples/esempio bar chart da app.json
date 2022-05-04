@@ -1,0 +1,31 @@
+{
+    "cat": [
+        "2010",
+        "2020",
+        "2030"
+    ],
+    "sets": [
+        {
+            "color": "#f066d7",
+            "name": "prova1",
+            "values": [
+                2,
+                1,
+                2
+            ]
+        },
+        {
+            "color": "#65d062",
+            "name": "prova2",
+            "values": [
+                1,
+                2,
+                1
+            ]
+        }
+    ],
+    "title": "cdsc",
+    "type": "bar",
+    "x axis title": "years",
+    "y axis title": "values"
+}

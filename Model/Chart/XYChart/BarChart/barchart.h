@@ -1,6 +1,7 @@
 #ifndef BARCHART_H
 #define BARCHART_H
 #include "Model/Chart/XYChart/xychart.h"
+#include <cstdlib>
 #include <QColor>
 #include <vector>
 using std::vector;
@@ -11,8 +12,8 @@ protected:
     QColor color;
     vector<double> values; //invariante, tanti quanti le categorie
 public:
-    Set(int values_size);
-    Set(const QString& name, vector<double> &arr);
+    Set(int values_size, const QColor& color =QColor(rand()%256, rand()%256, rand()%256));
+    Set(const QString& name, vector<double> &arr, const QColor& color =QColor(rand()%256, rand()%256, rand()%256));
     Set(const QJsonObject& obj);
     QString getName() const;
     int getValuesSize() const;

@@ -8,17 +8,23 @@
 #include <QToolBar>
 #include <QFileDialog>
 
-void View::manageOldChart() const{
+bool View::manageOldChart() const{
+    bool result = true;
     if(dynamic_cast<ChartWidget*>(mainW->centralWidget())){
+        result = false;
         QMessageBox msgBox;
         msgBox.setText("Chart has been modify");
         msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
         int ret = msgBox.exec();
-        if(ret == QMessageBox::Save)
+        if(ret == QMessageBox::Save){
             static_cast<ChartWidget*>(mainW->centralWidget())->saveChart();
+        }
+        else if(ret == QMessageBox::Discard)
+            result = true;
     }
+    return result;
 }
 
 void View::connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar_chart, QAction *new_line_chart, QAction *open_from_file) const{
@@ -28,13 +34,12 @@ void View::connectToolBarSignalsToSlots(QAction *new_pie_chart, QAction *new_bar
     QObject::connect(new_bar_chart, SIGNAL(triggered(bool)), this, SLOT(newBarChart()));
 }
 
-QWidget* View::initialCentralWidget() const
-{
+QWidget* View::initialCentralWidget() const{
     QWidget *w = new QWidget();
     QLabel *initial_text = new QLabel("Manage your chart with ChartManager");
     QFont f;
     f.setBold(true);
-    f.setPointSize(36);
+    f.setPointSize(28);
     initial_text->setStyleSheet("color:#d6d6d6");
     initial_text->setFont(f);
     initial_text->setAlignment(Qt::AlignCenter);
@@ -44,7 +49,6 @@ QWidget* View::initialCentralWidget() const
 }
 
 void View::configToolBarItems() const{
-
     tool_bar->setIconSize(QSize(36, 36));
     QAction *open_from_file = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\open.png"), "open from file");
     QAction *new_pie_chart = tool_bar->addAction(QIcon("..\\Chart-Application\\icon\\pie.png"), "new pie chart");
@@ -55,6 +59,7 @@ void View::configToolBarItems() const{
 }
 
 View::View(QObject *parent) : QObject(parent), mainW(new QMainWindow()), tool_bar(new QToolBar()){
+    mainW->setMinimumSize(QSize(700, 500));
     configToolBarItems();
     mainW->setCentralWidget(initialCentralWidget());
     mainW->addToolBar(Qt::LeftToolBarArea, tool_bar);
@@ -117,18 +122,18 @@ void View::openFromFile(){
 }
 
 void View::newPieChart(){
-    manageOldChart();
-    setCentralWidget(new PieChartWidget(this, new PieModel(this)));
+    if(manageOldChart())
+        setCentralWidget(new PieChartWidget(this, new PieModel(this)));
 }
 
 void View::newLineChart(){
-    manageOldChart();
-    setCentralWidget(new LineChartWidget(this, new LineModel(this)));
+    if(manageOldChart())
+        setCentralWidget(new LineChartWidget(this, new LineModel(this)));
 }
 
 void View::newBarChart(){
-    manageOldChart();
-    setCentralWidget(new BarChartWidget(this, new BarModel(this)));
+    if(manageOldChart())
+        setCentralWidget(new BarChartWidget(this, new BarModel(this)));
 }
 
 
