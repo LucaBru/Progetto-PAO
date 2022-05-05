@@ -106,8 +106,8 @@ void LineChartWidget::updateAxisRangeValue(double point_x, double point_y){
 }
 
 LineChartWidget::LineChartWidget(View *v, Model *m, QWidget *parent) : XYChartWidget(new QValueAxis(), new QValueAxis(), v, m, parent), line_name(new QLineEdit()), point_info(new QGroupBox("Point")), point_info_layout(new QFormLayout(point_info)), points(new QComboBox()), point_x_value(new QLineEdit()), point_y_value(new QLineEdit()), insert_point(new QPushButton("Add Point")), remove_point(new QPushButton("Remove Point")), remove_all_points(new QPushButton("Remove All Points")){
-
-    chart_view->setRenderHint(QPainter::Antialiasing);
+    y_axis->setRange(0, 1);
+    x_axis->setRange(0, 1);
     configChartWidgetItems();
     configLineChartWidgetItems();
     connectSignalsToSlots();
@@ -151,13 +151,15 @@ void LineChartWidget::userRemoveLine(){
 }
 
 void LineChartWidget::userChangeLineName(){
-    bool result = model->setData(model->index(series->currentIndex(), 0), line_name->text());
-    if(!result){
-        QMessageBox::warning(this, "Change Line Name", "Something goes wrong, rember that the name must by unique");
-        line_name->setStyleSheet("border: 1px solid red");
+    if(series->currentIndex() != -1){
+        bool result = model->setData(model->index(series->currentIndex(), 0), line_name->text());
+        if(!result){
+            QMessageBox::warning(this, "Change Line Name", "Something goes wrong, rember that the name must by unique");
+            line_name->setStyleSheet("border: 1px solid red");
+        }
+        else
+            line_name->setStyleSheet("");
     }
-    else
-        line_name->setStyleSheet("");
 }
 
 void LineChartWidget::currentPoint(int index){

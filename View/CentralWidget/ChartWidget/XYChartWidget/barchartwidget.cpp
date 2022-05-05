@@ -106,7 +106,6 @@ void BarChartWidget::configChartWidgetItems(){
 }
 
 void BarChartWidget::configBarChartWidgetItems(){
-    y_axis->setRange(0, 1);
     QHBoxLayout *set_name_layout = new QHBoxLayout();
     set_name_layout->addWidget(set_name);
     set_name_layout->addWidget(color);
@@ -194,7 +193,9 @@ void BarChartWidget::getSetsFromModel(){
 
 void BarChartWidget::getCategoriesFromModel(){
     if(model->columnCount()-1 > 0){
+        static_cast<QBarCategoryAxis*>(x_axis)->remove("");
         serie_info_layout->removeRow(add_new_category);
+        QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
         for(int i = 0; i < model->columnCount()-1; ++i){
             QString cat_name = static_cast<BarModel*>(model)->getCategoryNameAt(i);
             categories_axis->append(cat_name);
@@ -214,13 +215,13 @@ void BarChartWidget::changeSetColor(int set_index){
 }
 
 void BarChartWidget::resetCategoryBorderStyle(){
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     for(int i = 0; i < categories_axis->count(); ++i)
         static_cast<CategoryWidget*>(cat_items_layout->itemAt(i, QFormLayout::SpanningRole)->widget())->setDefaultBorder();
 }
 
 double BarChartWidget::findNewValueAxisMaxWithOutSet(QBarSet* set) const{
     double max = static_cast<QValueAxis*>(y_axis)->min();
-    cout << "max = " << max;
     QList<QBarSet*> bar_sets = bar_serie->barSets();
     for(QList<QBarSet*>::const_iterator i = bar_sets.begin(); i != bar_sets.end(); ++i){
         QBarSet *current = *i;
@@ -232,13 +233,15 @@ double BarChartWidget::findNewValueAxisMaxWithOutSet(QBarSet* set) const{
     return max;
 }
 
-BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : XYChartWidget(categories_axis = new QBarCategoryAxis(), new QValueAxis(), v, m, p), bar_serie(new QBarSeries(chart)), add_new_category(new QPushButton("Add New Category")), cat_items_layout(new QFormLayout()), set_name(new QLineEdit()){
+BarChartWidget::BarChartWidget(View *v, Model *m, QWidget *p) : XYChartWidget(new QBarCategoryAxis(), new QValueAxis(), v, m, p), bar_serie(new QBarSeries(chart)), add_new_category(new QPushButton("Add New Category")), cat_items_layout(new QFormLayout()), set_name(new QLineEdit()){
+    static_cast<QBarCategoryAxis*>(x_axis)->append(""); //codice necessario per il corretto posizionamento del titolo in caso di asse senza elementi (bug qt)
+    y_axis->setRange(0, 1);
     configChartWidgetItems();
     configBarChartWidgetItems();
     connectSignalsAndSlots();
     connectBarModelSignals();
     chart->addSeries(bar_serie);
-    bar_serie->attachAxis(categories_axis);
+    bar_serie->attachAxis(x_axis);
     bar_serie->attachAxis(y_axis);
 }
 
@@ -261,9 +264,12 @@ void BarChartWidget::removeCategory(int index){
 void BarChartWidget::addCategory(int index){
     bool valid = false;
     QString cat_name;
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     cat_name = QInputDialog::getText(this, "", "Insert new category name", QLineEdit::Normal, cat_name,  &valid);
     if(valid){
         if(static_cast<BarModel*>(model)->isCategoryNameValid(cat_name)){
+            if(categories_axis->count() == 1 && categories_axis->at(0).isEmpty())
+                categories_axis->remove("");
             model->insertColumns(index+1, 1);
             categories_axis->insert(index, cat_name);
             static_cast<BarModel*>(model)->changeCategoryNameAt(index, cat_name);
@@ -302,6 +308,7 @@ void BarChartWidget::userRemoveSet(){
 }
 
 void BarChartWidget::userInsertFirstCategory(){
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     addCategory(0);
     if(categories_axis->count() > 0)
         serie_info_layout->removeRow(add_new_category);
@@ -309,13 +316,16 @@ void BarChartWidget::userInsertFirstCategory(){
 }
 
 void BarChartWidget::userChangeSetName(){
-    if(!model->setData(model->index(series->currentIndex(), 0), set_name->text())){
-        QMessageBox::warning(this, "Change Set Name", "Something goes wrong, rember that the name must by unique");
-        set_name->setStyleSheet("border: 1px solid red");
+    if(series->currentIndex() != -1){
+        if(!model->setData(model->index(series->currentIndex(), 0), set_name->text())){
+            QMessageBox::warning(this, "Change Set Name", "Something goes wrong, rember that the name must by unique");
+            set_name->setStyleSheet("border: 1px solid red");
+        }
     }
 }
 
 void BarChartWidget::multipleSetsInserted(int row, int count){
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     if(row >= 0 && row <= bar_serie->count() && count > 0){
         QList<qreal> list;
         for(int i = 0; i < categories_axis->count(); ++i)
@@ -339,16 +349,21 @@ void BarChartWidget::multipleCategoriesInserted(int column, int count){
 }
 
 void BarChartWidget::multipleCategoriesRemoved(int column, int count){
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     for(int i = column; i < column+count; ++i){
         categories_axis->remove(categories_axis->at(i));
         removeSetsValueAtIndex(i);
         cat_items_layout->removeRow(i);
     }
+    cout << "Numero categories in x_axis = " << categories_axis->count();
     updateIndexOfCategoryWidgetItems(column, 0);
+    if(categories_axis->count() == 0)
+        categories_axis->append("");
 }
 
 void BarChartWidget::categoryAtChangedName(int index, const QString &new_name){
     CategoryWidget *item = static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget());
+    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     item->setDefaultBorder();
     item->setCategoryName(new_name);
     if(index >= 0 && index < categories_axis->count() && categories_axis->at(index) != new_name){
@@ -393,7 +408,6 @@ void BarChartWidget::currentSetChanged(int index){
     set_name->setText(model->data(model->index(index, 0)).toString());
     set_name->setStyleSheet("");
     updateSetValueOnSeriesCurrentIndexChanged(index);
-    resetCategoryBorderStyle();
 }
 
 

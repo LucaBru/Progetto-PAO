@@ -3,7 +3,7 @@
 #include "Model/piemodel.h"
 
 void ChartWidget::connectSignalsToSlots() const{
-    QObject::connect(chart_title, SIGNAL(editingFinished()), this, SLOT(changeTitle()));
+    QObject::connect(chart_title, SIGNAL(returnPressed()), this, SLOT(changeTitle()));
     QObject::connect(save, SIGNAL(triggered(bool)), this, SLOT(saveChart()));
     QObject::connect(save_as, SIGNAL(triggered(bool)), this, SLOT(saveChartAs()));
 }
@@ -26,12 +26,11 @@ void ChartWidget::configChartWidgetItems(){
 }
 
 ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, parent), model(m), chart_info(new QGroupBox()), serie_info(new QGroupBox()), series(new QComboBox()), chart_title(new QLineEdit()), add_serie(new QPushButton()), remove_serie(new QPushButton()), chart(new QChart()), chart_view(new QChartView(chart)), chart_info_layout(new QFormLayout(chart_info)), serie_info_layout(new QFormLayout(serie_info)), main_layout(new QGridLayout(this)), color(new QToolButton()){
+    chart_view->setRenderHint(QPainter::Antialiasing);
     series->setModel(model);
     configChartWidgetItems();
-
     save = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save.png"), "save");
     save_as = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save as.png"), "save as");
-
     connectSignalsToSlots();
 }
 

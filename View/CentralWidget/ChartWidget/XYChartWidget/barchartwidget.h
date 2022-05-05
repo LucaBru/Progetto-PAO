@@ -43,7 +43,6 @@ class BarChartWidget : public XYChartWidget{
     Q_OBJECT
 private:
     QBarSeries *bar_serie;
-    QBarCategoryAxis *categories_axis;
     QLineEdit *set_name;
     QPushButton *add_new_category;
     QFormLayout *cat_items_layout;
