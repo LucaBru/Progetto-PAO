@@ -1,0 +1,26 @@
+{
+    "slices": [
+        {
+            "color": "#5ce6b3",
+            "name": "slice 1",
+            "value": 12
+        },
+        {
+            "color": "#3d8cfb",
+            "name": "slice 2",
+            "value": 5
+        },
+        {
+            "color": "#deec5d",
+            "name": "slice 3",
+            "value": 3
+        },
+        {
+            "color": "#ec64f8",
+            "name": "slice 4",
+            "value": 1
+        }
+    ],
+    "title": "Esempio di grafo a torta",
+    "type": "pie"
+}

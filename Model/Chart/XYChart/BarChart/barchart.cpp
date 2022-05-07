@@ -88,7 +88,7 @@ void BarChart::destroySets(BarChart &from){
 }
 
 bool BarChart::isSetNameValid(const QString &name) const{
-    bool result = true;
+    bool result = !name.isEmpty();
     for(vector<Set*>::const_iterator i = sets.begin(); i != sets.end() && result; ++i)
         result = (*i)->getName().compare(name);
     return result;

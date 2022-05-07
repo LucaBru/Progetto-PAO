@@ -22,15 +22,15 @@ void ChartWidget::configChartWidgetItems(){
     chart_info_layout->addRow("Title", chart_title);
     chart_info_layout->addRow(add_serie);
     chart_info_layout->addRow(remove_serie);
-    color->setIcon(QIcon("..\\Chart-Application\\icon\\color.png"));
+    color->setIcon(QIcon(":/icon/color.png"));
 }
 
 ChartWidget::ChartWidget(View *v, Model *m, QWidget *parent) : CentralWidget(v, parent), model(m), chart_info(new QGroupBox()), serie_info(new QGroupBox()), series(new QComboBox()), chart_title(new QLineEdit()), add_serie(new QPushButton()), remove_serie(new QPushButton()), chart(new QChart()), chart_view(new QChartView(chart)), chart_info_layout(new QFormLayout(chart_info)), serie_info_layout(new QFormLayout(serie_info)), main_layout(new QGridLayout(this)), color(new QToolButton()){
     chart_view->setRenderHint(QPainter::Antialiasing);
     series->setModel(model);
     configChartWidgetItems();
-    save = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save.png"), "save");
-    save_as = view->addActionToToolBar(QIcon("..\\Chart-Application\\icon\\save as.png"), "save as");
+    save = view->addActionToToolBar(QIcon(":/icon/save.png"), "save");
+    save_as = view->addActionToToolBar(QIcon(":/icon/save as.png"), "save as");
     connectSignalsToSlots();
 }
 

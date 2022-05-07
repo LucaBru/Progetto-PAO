@@ -6,8 +6,6 @@
 #include <QColorDialog>
 #include <QColor>
 #include <QFrame>
-#include <iostream>
-using std::cout;
 
 // ---------------------- CATEGORYWIDGET -----------------------------------------------
 
@@ -24,8 +22,8 @@ void CategoryWidget::confWidgetItems(){
     cat_val->setBottom(0);
     set_value->setValidator(cat_val);
     set_value->setPlaceholderText("0");
-    garbage->setIcon(QIcon("..\\Chart-Application\\icon\\garbage.png"));
-    add_new_category->setIcon(QIcon("..\\Chart-Application\\icon\\plus.png"));
+    garbage->setIcon(QIcon(":/icon/garbage.png"));
+    add_new_category->setIcon(QIcon(":/icon/plus.png"));
     QHBoxLayout *l = new QHBoxLayout(this);
     l->addWidget(garbage);
     l->addWidget(category_name);
@@ -144,7 +142,7 @@ void BarChartWidget::updateIndexOfCategoryWidgetItems(int index, int count){
 void BarChartWidget::updateSetValueOnSeriesCurrentIndexChanged(int index){
     if(index >= 0 && index < bar_serie->count()){
         QBarSet* set = bar_serie->barSets()[index];
-        for(int i = 0; i < set->count(); ++i){
+        for(int i = 0; i < cat_items_layout->rowCount(); ++i){
             CategoryWidget *current_cat_widget = dynamic_cast<CategoryWidget*>(cat_items_layout->itemAt(i, QFormLayout::SpanningRole)->widget());
             if(current_cat_widget)
                 current_cat_widget->setValue(set->at(i));
@@ -276,7 +274,7 @@ void BarChartWidget::addCategory(int index){
             valid = true;
         }
         else
-            QMessageBox::warning(this, "Add Category", "Category's name must by unique");
+            QMessageBox::warning(this, "Add Category", "Category's name must by unique and not empty");
     }
 }
 
@@ -284,7 +282,7 @@ void BarChartWidget::changeCategoryName(int index, const QString &new_name){
     bool result = static_cast<BarModel*>(model)->changeCategoryNameAt(index, new_name);
     CategoryWidget* cat = static_cast<CategoryWidget*>(cat_items_layout->itemAt(index, QFormLayout::SpanningRole)->widget());
     if(!result){
-        QMessageBox::warning(this, "Change Category Name", "Something goes wrong, rember that the name must by unique");
+        QMessageBox::warning(this, "Change Category Name", "Something goes wrong, rember that the name must by unique and not empty");
         cat->setBorderForTextError();
     }
     else
@@ -310,7 +308,7 @@ void BarChartWidget::userRemoveSet(){
 void BarChartWidget::userInsertFirstCategory(){
     QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
     addCategory(0);
-    if(categories_axis->count() > 0)
+    if(!categories_axis->at(0).isEmpty())
         serie_info_layout->removeRow(add_new_category);
 
 }
@@ -318,17 +316,17 @@ void BarChartWidget::userInsertFirstCategory(){
 void BarChartWidget::userChangeSetName(){
     if(series->currentIndex() != -1){
         if(!model->setData(model->index(series->currentIndex(), 0), set_name->text())){
-            QMessageBox::warning(this, "Change Set Name", "Something goes wrong, rember that the name must by unique");
+            QMessageBox::warning(this, "Change Set Name", "Something goes wrong, rember that the name must by unique and not empty");
             set_name->setStyleSheet("border: 1px solid red");
         }
     }
 }
 
 void BarChartWidget::multipleSetsInserted(int row, int count){
-    QBarCategoryAxis *categories_axis = static_cast<QBarCategoryAxis*>(x_axis);
+    QBarCategoryAxis *cat_axis = static_cast<QBarCategoryAxis*>(x_axis);
     if(row >= 0 && row <= bar_serie->count() && count > 0){
         QList<qreal> list;
-        for(int i = 0; i < categories_axis->count(); ++i)
+        for(int i = 0; i < cat_axis->count(); ++i)
             list.push_back(0);
         for(int i = 0; i < count; ++i){
             QBarSet *s = new QBarSet("");
@@ -355,7 +353,6 @@ void BarChartWidget::multipleCategoriesRemoved(int column, int count){
         removeSetsValueAtIndex(i);
         cat_items_layout->removeRow(i);
     }
-    cout << "Numero categories in x_axis = " << categories_axis->count();
     updateIndexOfCategoryWidgetItems(column, 0);
     if(categories_axis->count() == 0)
         categories_axis->append("");

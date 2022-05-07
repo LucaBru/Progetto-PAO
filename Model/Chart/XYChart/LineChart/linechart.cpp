@@ -262,8 +262,8 @@ LineChart::~LineChart(){
 }
 
 bool LineChart::changeLineName(int line_index, const QString &new_name){
-    bool result = false;
-    if(line_index >= 0 && line_index < lines.size() && !existLineName(new_name)){
+    bool result = !new_name.isEmpty();
+    if(result && line_index >= 0 && line_index < lines.size() && !existLineName(new_name)){
         lines[line_index]->changeName(new_name);
         result = true;
     }

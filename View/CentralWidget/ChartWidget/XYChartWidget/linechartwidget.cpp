@@ -154,7 +154,7 @@ void LineChartWidget::userChangeLineName(){
     if(series->currentIndex() != -1){
         bool result = model->setData(model->index(series->currentIndex(), 0), line_name->text());
         if(!result){
-            QMessageBox::warning(this, "Change Line Name", "Something goes wrong, rember that the name must by unique");
+            QMessageBox::warning(this, "Change Line Name", "Something goes wrong, rember that the name must by unique and not empty");
             line_name->setStyleSheet("border: 1px solid red");
         }
         else

@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/app.ico</file>
+        <file>icon/bar.png</file>
+        <file>icon/color.png</file>
+        <file>icon/garbage.png</file>
+        <file>icon/line.png</file>
+        <file>icon/open.png</file>
+        <file>icon/pie.png</file>
+        <file>icon/plus.png</file>
+        <file>icon/save as.png</file>
+        <file>icon/save.png</file>
+    </qresource>
+</RCC>

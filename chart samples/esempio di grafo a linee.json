@@ -1,0 +1,48 @@
+{
+    "lines": [
+        {
+            "color": "#6e806c",
+            "name": "linea 1",
+            "x values": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "y values": [
+                2,
+                6,
+                1,
+                4,
+                2,
+                3
+            ]
+        },
+        {
+            "color": "#bf1619",
+            "name": "linea 2",
+            "x values": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "y values": [
+                1,
+                0,
+                4,
+                2,
+                8,
+                4
+            ]
+        }
+    ],
+    "title": "Esempio grafo a linee",
+    "type": "line",
+    "x axis title": "Asse x",
+    "y axis title": "Asse y"
+}

@@ -1,0 +1,28 @@
+{
+    "cat": [
+    ],
+    "sets": [
+        {
+            "color": "#904076",
+            "name": "",
+            "values": [
+            ]
+        },
+        {
+            "color": "#980f09",
+            "name": "",
+            "values": [
+            ]
+        },
+        {
+            "color": "#e46b5b",
+            "name": "",
+            "values": [
+            ]
+        }
+    ],
+    "title": "",
+    "type": "bar",
+    "x axis title": "",
+    "y axis title": ""
+}

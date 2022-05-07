@@ -54,7 +54,7 @@ void PieChart::deleteSlices(PieChart & pieChart){
 }
 
 bool PieChart::isSliceNameValid(const QString& name) const{
-    bool valid = true;
+    bool valid = !name.isEmpty();
     for(vector<Slice*>::const_iterator i = slices.begin(); valid && i != slices.end(); ++i)
         valid = (*i)->getName().compare(name);
     return valid;
