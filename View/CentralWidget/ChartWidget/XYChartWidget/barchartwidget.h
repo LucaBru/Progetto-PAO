@@ -21,10 +21,10 @@ private:
     QLineEdit *category_name;
     QLineEdit *set_value;
     QToolButton *add_new_category;
-    QLineEdit *value_axis_label;
 
     void confWidgetItems();
     void connectSignalsAndSlots() const;
+
 public:
     unsigned int index;
     CategoryWidget(BarChartWidget *parent, int index);
@@ -32,6 +32,7 @@ public:
     void setCategoryName(const QString& name);
     void setBorderForTextError();
     void setDefaultBorder();
+
 private slots:
     void userRemoveCategory();
     void userAddCategory();

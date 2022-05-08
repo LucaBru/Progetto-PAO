@@ -18,7 +18,6 @@ protected:
 public:
     View(QObject *parent =nullptr);
     ~View();
-
     void setCentralWidget(QWidget* widget);
     void show() const;
     QMainWindow* getMainWindow() const;

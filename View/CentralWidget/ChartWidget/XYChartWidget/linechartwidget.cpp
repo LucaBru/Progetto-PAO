@@ -225,8 +225,11 @@ void LineChartWidget::multipleLinesInserted(int row, int count){
 }
 
 void LineChartWidget::multipleLinesRemoved(int row, int count){
-    for(int i = 0; i < count; ++i)
-        chart->removeSeries(lines[row+i]);
+    for(int i = 0; i < count; ++i){
+        QLineSeries* current = lines[row+i];
+        chart->removeSeries(current);
+        delete current;
+    }
     lines.erase(lines.begin()+row, lines.begin()+row+count);
 }
 

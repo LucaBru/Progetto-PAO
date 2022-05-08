@@ -25,14 +25,14 @@ void Model::changeChartTitle(const QString &new_title){
 
 bool Model::save(const QString &path) const{
     QJsonObject *chart_obj = chart->parsing();
-
+    bool result = false;
     QFile file(path);
     if(file.open(QFile::WriteOnly)){
         file.write(QJsonDocument(*chart_obj).toJson());
-        delete chart_obj;
-        return true;
+        result = true;
     }
-    return false;
+    delete chart_obj;
+    return result;
 }
 
 

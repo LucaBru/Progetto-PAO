@@ -15,7 +15,7 @@ void XYChartWidget::configXYChartWidgetItems(){
 XYChartWidget::XYChartWidget(QAbstractAxis *x, QAbstractAxis *y, View *v, Model *m, QWidget *parent) : ChartWidget(v, m, parent), x_axis(x), y_axis(y), x_axis_title(new QLineEdit()), y_axis_title(new QLineEdit()){
     connectSignalsToSlots();
     configXYChartWidgetItems();
-    chart->addAxis(x_axis, Qt::AlignBottom);
+    chart->addAxis(x_axis, Qt::AlignBottom); //chart take ownership of the axis
     chart->addAxis(y_axis, Qt::AlignLeft);
 }
 

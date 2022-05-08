@@ -42,7 +42,7 @@ void ChartWidget::createChartFromModel(){
 
 ChartWidget::~ChartWidget(){
     //tutti gli items eliminati
-    //chart essendo associato a chart_view viene eliminato da esse
+    //chart essendo associato a chart_view viene eliminato da esso
     view->removeAction(save);
     view->removeAction(save_as);
     delete save;

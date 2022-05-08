@@ -27,7 +27,6 @@ protected:
     QLineEdit *chart_title;
     QPushButton *add_serie;
     QPushButton *remove_serie;
-    QRadioButton *legend;
     QToolButton *color;
     QAction *save;
     QAction *save_as;
