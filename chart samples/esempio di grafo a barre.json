@@ -1,28 +1,40 @@
 {
     "cat": [
+        "categoria 1",
+        "categoria 2",
+        "categoria 3"
     ],
     "sets": [
         {
-            "color": "#904076",
-            "name": "",
+            "color": "#037be7",
+            "name": "set 1",
             "values": [
+                1.8,
+                2.3,
+                4.1
             ]
         },
         {
-            "color": "#980f09",
-            "name": "",
+            "color": "#67cd6a",
+            "name": "set 2",
             "values": [
+                2,
+                3,
+                3.5
             ]
         },
         {
-            "color": "#e46b5b",
-            "name": "",
+            "color": "#fc8c2e",
+            "name": "set 3",
             "values": [
+                2,
+                2,
+                3
             ]
         }
     ],
-    "title": "",
+    "title": "Esempio grafo a barre",
     "type": "bar",
-    "x axis title": "",
-    "y axis title": ""
+    "x axis title": "Asse x",
+    "y axis title": "Asse y"
 }

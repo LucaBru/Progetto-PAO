@@ -45,6 +45,7 @@ void LineChartWidget::configLineChartWidgetItems() const{
     QHBoxLayout *line_name_layout = new QHBoxLayout();
     line_name_layout->addWidget(line_name);
     line_name_layout->addWidget(color);
+    line_name->setPlaceholderText("none");
     serie_info_layout->addRow("Line name", line_name_layout);
     serie_info_layout->addRow(point_info);
     point_info_layout->addRow("Points", points);

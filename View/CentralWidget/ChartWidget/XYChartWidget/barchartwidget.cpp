@@ -107,8 +107,8 @@ void BarChartWidget::configBarChartWidgetItems(){
     QHBoxLayout *set_name_layout = new QHBoxLayout();
     set_name_layout->addWidget(set_name);
     set_name_layout->addWidget(color);
-    set_name->setPlaceholderText("set name");
-    serie_info_layout->addRow(set_name_layout);
+    set_name->setPlaceholderText("none");
+    serie_info_layout->addRow("Set name", set_name_layout);
     if(cat_items_layout->rowCount() == 0)
         serie_info_layout->addRow(add_new_category);
     QSizePolicy p;
