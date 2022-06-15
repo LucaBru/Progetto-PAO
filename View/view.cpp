@@ -86,7 +86,7 @@ QMainWindow* View::getMainWindow() const{
 }
 
 QAction* View::addActionToToolBar(const QIcon &icon, const QString &text){
-    tool_bar->addAction(icon, text);
+    return tool_bar->addAction(icon, text);
 }
 
 void View::removeAction(QAction *action){
